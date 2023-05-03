@@ -37,4 +37,10 @@ public class EmployeeController {
         request.getSession().removeAttribute("employeeId");
         return Result.success("退出成功!");
     }
+
+
+    @PostMapping
+    public Result<String> addEmployee(HttpServletRequest request, @RequestBody Employee employee) {
+        return employeeService.addEmployee(request, employee);
+    }
 }

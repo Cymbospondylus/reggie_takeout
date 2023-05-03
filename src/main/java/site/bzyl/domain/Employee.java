@@ -32,10 +32,14 @@ public class Employee implements Serializable {
     private Integer status;
     // todo 为什么用 LocalDateTime 不用 Date
     private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
+
     // todo 将来会讲TableField
     @TableField(fill = FieldFill.INSERT)
     private Long createUser;
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
+    private Long updateUser;
+
 
 }

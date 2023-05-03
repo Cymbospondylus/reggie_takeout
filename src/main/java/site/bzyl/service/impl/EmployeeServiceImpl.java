@@ -16,6 +16,7 @@ import site.bzyl.service.IEmployeeService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements IEmployeeService {
@@ -58,5 +59,33 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         request.getSession().setAttribute("employeeId", employeeDto.getId());
 
         return Result.success(employeeDto);
+    }
+
+    @Override
+    public Result<String> addEmployee(HttpServletRequest request, Employee employee) {
+        // 设置默认密码 123456
+        String password = DigestUtils.md5DigestAsHex("123456".getBytes());
+        employee.setPassword(password);
+
+        // 设置默认状态为 启用（1）
+        employee.setStatus(1);
+
+        // 设置 创建时间 和 修改时间 为 当前时间
+        LocalDateTime now = LocalDateTime.now();
+        employee.setCreateTime(now);
+        employee.setUpdateTime(now);
+
+        // 设置 创建人 和 修改人 为 当前管理员用户
+        Long currentEmployeeId = (Long) request.getSession().getAttribute("employeeId");
+        employee.setCreateUser(currentEmployeeId);
+        employee.setUpdateUser(currentEmployeeId);
+
+        boolean result = save(employee);
+
+        if (!result) {
+            return Result.error("添加员工失败！");
+        }
+
+        return Result.success("添加成功！");
     }
 }
