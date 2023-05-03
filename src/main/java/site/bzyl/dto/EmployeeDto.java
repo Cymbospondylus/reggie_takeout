@@ -10,7 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 public class EmployeeDto {
-    private Integer id;
+    private Long id;
     private String name;
     private String username;
     private String phone;

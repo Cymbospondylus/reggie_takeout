@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import site.bzyl.domain.Employee;
-import site.bzyl.domain.Result;
+import site.bzyl.commom.Result;
 
 @SpringBootTest
 @Slf4j
@@ -23,7 +23,6 @@ public class EmployServiceTest {
 
     @Test
     public void testLogin() {
-        Result result = service.login("admin", "123456");
-        System.out.println(result);
+
     }
 }

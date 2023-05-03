@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import site.bzyl.domain.Employee;
-import site.bzyl.domain.Result;
+import site.bzyl.commom.Result;
+import site.bzyl.dto.EmployeeDto;
 import site.bzyl.service.IEmployeeService;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/employee")
@@ -16,8 +19,8 @@ public class EmployeeController {
     private IEmployeeService employeeService;
 
     @PostMapping("/login")
-    public Result login(@RequestBody Employee employee) {
+    public Result<EmployeeDto> login(HttpServletRequest request, @RequestBody Employee employee) {
         System.out.println(employee);
-        return employeeService.login(employee.getUsername(), employee.getPassword());
+        return employeeService.login(request, employee.getUsername(), employee.getPassword());
     }
 }
