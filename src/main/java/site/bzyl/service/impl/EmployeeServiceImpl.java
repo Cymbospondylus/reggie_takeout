@@ -1,22 +1,23 @@
 package site.bzyl.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import site.bzyl.dao.EmployeeMapper;
+import site.bzyl.domain.DataPage;
 import site.bzyl.domain.Employee;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.EmployeeDto;
 import site.bzyl.service.IEmployeeService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements IEmployeeService {
@@ -87,5 +88,31 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         }
 
         return Result.success("添加成功！");
+    }
+
+    @Override
+    public Result<DataPage<EmployeeDto>> getPage(Integer page, Integer pageSize) {
+        // 分页查询
+        Page<Employee> empPage = new Page<>(page, pageSize);
+        mapper.selectPage(empPage, null);
+        List<Employee> records = empPage.getRecords();
+
+        // 为空则返回 null
+        if (records == null) {
+            return Result.error("员工列表为空！");
+        }
+
+        // 拷贝成dto对象
+        List<EmployeeDto> employeeDtoList = new ArrayList<>();
+        records.forEach((employee) -> {
+            EmployeeDto employeeDto = new EmployeeDto();
+            BeanUtils.copyProperties(employee, employeeDto);
+            employeeDtoList.add(employeeDto);
+        });
+
+        // 封装成 Page 对象返回
+        long total = empPage.getTotal();
+        DataPage<EmployeeDto> dataPage = new DataPage<>(employeeDtoList, total);
+        return Result.success(dataPage);
     }
 }

@@ -1,17 +1,17 @@
 package site.bzyl.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import site.bzyl.domain.DataPage;
 import site.bzyl.domain.Employee;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.EmployeeDto;
 import site.bzyl.service.IEmployeeService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController /* @RestController 相当于 @Controller + 每个方法上的@ResponseBody 可以将 return 的对象转为json */
 @RequestMapping("/employee")
@@ -38,9 +38,16 @@ public class EmployeeController {
         return Result.success("退出成功!");
     }
 
-
+    /*
+    * 新增员工
+    * */
     @PostMapping
     public Result<String> addEmployee(HttpServletRequest request, @RequestBody Employee employee) {
         return employeeService.addEmployee(request, employee);
+    }
+
+    @GetMapping("/page")
+    public Result<DataPage<EmployeeDto>> getPage(@Param("page") Integer page, @Param("pageSize") Integer pageSize) {
+        return employeeService.getPage(page, pageSize);
     }
 }
