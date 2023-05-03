@@ -55,7 +55,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         BeanUtils.copyProperties(employee, employeeDto);
 
         // 保存到 session 中, key不能是id，因为用户不知道自己的id
-        request.getSession().setAttribute("session", employeeDto.getId());
+        request.getSession().setAttribute("employeeId", employeeDto.getId());
 
         return Result.success(employeeDto);
     }

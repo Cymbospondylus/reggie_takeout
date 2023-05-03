@@ -34,7 +34,7 @@ public class EmployeeController {
     @PostMapping("/logout")
     /* 泛型不知道写什么就写个String */
     public Result<String> logout(HttpServletRequest request) {
-        request.getSession().removeAttribute("session");
+        request.getSession().removeAttribute("employeeId");
         return Result.success("退出成功!");
     }
 }
