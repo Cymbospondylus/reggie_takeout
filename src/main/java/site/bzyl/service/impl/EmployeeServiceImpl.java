@@ -1,6 +1,7 @@
 package site.bzyl.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -64,12 +65,21 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
 
     @Override
     public Result<String> addEmployee(HttpServletRequest request, Employee employee) {
-        // 设置默认密码 123456
+        // todo 这样用if判断来解决异常十分的土味，直接try-catch也很low，用全局异常捕获比较优雅
+        // username 字段添加了 unique 索引，需要先判断是否重复
+        String username = employee.getUsername();
+        LambdaQueryWrapper<Employee> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Employee::getUsername, username);
+        Employee alreadyExists = getOne(lqw);
+        if (alreadyExists != null) {
+            return Result.error("账号已存在！");
+        }
+
+
+        // 设置默认密码 123456 todo 应当修改为身份证后四位MD5加密
         String password = DigestUtils.md5DigestAsHex("123456".getBytes());
         employee.setPassword(password);
 
-        // 设置默认状态为 启用（1）
-        employee.setStatus(1);
 
         // 设置 创建时间 和 修改时间 为 当前时间
         LocalDateTime now = LocalDateTime.now();
@@ -93,7 +103,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     @Override
     public Result<DataPage<EmployeeDto>> getPage(Integer page, Integer pageSize) {
         // 分页查询
-        Page<Employee> empPage = new Page<>(page, pageSize);
+        IPage<Employee> empPage = new Page<>(page, pageSize);
         mapper.selectPage(empPage, null);
         List<Employee> records = empPage.getRecords();
 
