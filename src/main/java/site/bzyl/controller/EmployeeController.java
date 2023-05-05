@@ -1,17 +1,16 @@
 package site.bzyl.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import site.bzyl.constant.HttpConstant;
 import site.bzyl.domain.DataPage;
 import site.bzyl.domain.Employee;
 import site.bzyl.commom.Result;
-import site.bzyl.dto.EmployeeDto;
+import site.bzyl.dto.EmployeeDTO;
 import site.bzyl.service.IEmployeeService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @RestController /* @RestController 相当于 @Controller + 每个方法上的@ResponseBody 可以将 return 的对象转为json */
 @RequestMapping("/employee")
@@ -23,7 +22,7 @@ public class EmployeeController {
     * 员工登录
     * */
     @PostMapping("/login")
-    public Result<EmployeeDto> login(HttpServletRequest request, @RequestBody Employee employee) {
+    public Result<EmployeeDTO> login(HttpServletRequest request, @RequestBody Employee employee) {
         System.out.println(employee);
         return employeeService.login(request, employee.getUsername(), employee.getPassword());
     }
@@ -34,7 +33,7 @@ public class EmployeeController {
     @PostMapping("/logout")
     /* 泛型不知道写什么就写个String */
     public Result<String> logout(HttpServletRequest request) {
-        request.getSession().removeAttribute("employeeId");
+        request.getSession().removeAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID);
         return Result.success("退出成功!");
     }
 
@@ -47,7 +46,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/page")
-    public Result<DataPage<EmployeeDto>> getPage(@Param("page") Integer page, @Param("pageSize") Integer pageSize) {
+    public Result<DataPage<EmployeeDTO>> getPage(@Param("page") Integer page, @Param("pageSize") Integer pageSize) {
         return employeeService.getPage(page, pageSize);
     }
 }

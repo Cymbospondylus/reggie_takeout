@@ -8,11 +8,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import site.bzyl.constant.HttpConstant;
 import site.bzyl.dao.EmployeeMapper;
 import site.bzyl.domain.DataPage;
 import site.bzyl.domain.Employee;
 import site.bzyl.commom.Result;
-import site.bzyl.dto.EmployeeDto;
+import site.bzyl.dto.EmployeeDTO;
 import site.bzyl.service.IEmployeeService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +27,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     private EmployeeMapper mapper;
 
     @Override
-    public Result<EmployeeDto> login(HttpServletRequest request, String username, String password) {
+    public Result<EmployeeDTO> login(HttpServletRequest request, String username, String password) {
         // 判空
         if (username == null || password == null) {
             return Result.error("用户名或密码不能为空！");
@@ -54,11 +55,11 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         }
 
         // 封装为 dto 对象
-        EmployeeDto employeeDto = new EmployeeDto();
+        EmployeeDTO employeeDto = new EmployeeDTO();
         BeanUtils.copyProperties(employee, employeeDto);
 
         // 保存到 session 中, key不能是id，因为用户不知道自己的id
-        request.getSession().setAttribute("employeeId", employeeDto.getId());
+        request.getSession().setAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID, employeeDto.getId());
 
         return Result.success(employeeDto);
     }
@@ -75,7 +76,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         employee.setUpdateTime(now);
 
         // 设置 创建人 和 修改人 为 当前管理员用户
-        Long currentEmployeeId = (Long) request.getSession().getAttribute("employeeId");
+        Long currentEmployeeId = (Long) request.getSession().getAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID);
         employee.setCreateUser(currentEmployeeId);
         employee.setUpdateUser(currentEmployeeId);
 
@@ -89,7 +90,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     }
 
     @Override
-    public Result<DataPage<EmployeeDto>> getPage(Integer page, Integer pageSize) {
+    public Result<DataPage<EmployeeDTO>> getPage(Integer page, Integer pageSize) {
         // 分页查询
         IPage<Employee> empPage = new Page<>(page, pageSize);
         mapper.selectPage(empPage, null);
@@ -101,16 +102,16 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         }
 
         // 拷贝成dto对象
-        List<EmployeeDto> employeeDtoList = new ArrayList<>();
+        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
         records.forEach((employee) -> {
-            EmployeeDto employeeDto = new EmployeeDto();
+            EmployeeDTO employeeDto = new EmployeeDTO();
             BeanUtils.copyProperties(employee, employeeDto);
-            employeeDtoList.add(employeeDto);
+            employeeDTOList.add(employeeDto);
         });
 
         // 封装成 Page 对象返回
         long total = empPage.getTotal();
-        DataPage<EmployeeDto> dataPage = new DataPage<>(employeeDtoList, total);
+        DataPage<EmployeeDTO> dataPage = new DataPage<>(employeeDTOList, total);
         return Result.success(dataPage);
     }
 }
