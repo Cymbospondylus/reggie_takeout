@@ -4,13 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import site.bzyl.constant.HttpConstant;
 import site.bzyl.dao.EmployeeMapper;
-import site.bzyl.domain.DataPage;
 import site.bzyl.domain.Employee;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.EmployeeDTO;
@@ -90,28 +90,22 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     }
 
     @Override
-    public Result<DataPage<EmployeeDTO>> getPage(Integer page, Integer pageSize) {
-        // 分页查询
-        IPage<Employee> empPage = new Page<>(page, pageSize);
-        mapper.selectPage(empPage, null);
-        List<Employee> records = empPage.getRecords();
+    public Result<Page> getPage(Integer page, Integer pageSize, String name) {
 
-        // 为空则返回 null
-        if (records == null) {
-            return Result.error("员工列表为空！");
-        }
+        // 分页构造器
+        Page<Employee> pageInfo = new Page<>(page, pageSize);
 
-        // 拷贝成dto对象
-        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
-        records.forEach((employee) -> {
-            EmployeeDTO employeeDto = new EmployeeDTO();
-            BeanUtils.copyProperties(employee, employeeDto);
-            employeeDTOList.add(employeeDto);
-        });
+        // 条件构造器
+        LambdaQueryWrapper<Employee> lqw = new LambdaQueryWrapper<>();
+        // MP提供的条件查询api, 使用 condition 就能比 if(name != null) 更优雅地判空
+        // 声明 queryWrapper 的时候要记得加泛型<Employee> 否则不能用方法引用, like 的参数列表会变为 (boolean condition, R column, Object val)
+        lqw.like(StringUtils.isNotEmpty(name), Employee::getName, name);
 
-        // 封装成 Page 对象返回
-        long total = empPage.getTotal();
-        DataPage<EmployeeDTO> dataPage = new DataPage<>(employeeDTOList, total);
-        return Result.success(dataPage);
+
+        // IService 里的 page 方法调用了BaseMapper的 selectPage 方法, 最后结果直接封装到传入的 Page 对象（pageInfo）
+        // 不需要自定义类 PageData 了, 框架已经封装好可直接传入
+        page(pageInfo, lqw);
+
+        return Result.success(pageInfo);
     }
 }

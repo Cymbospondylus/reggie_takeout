@@ -1,10 +1,11 @@
 package site.bzyl.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.bzyl.constant.HttpConstant;
-import site.bzyl.domain.DataPage;
 import site.bzyl.domain.Employee;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.EmployeeDTO;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController /* @RestController 相当于 @Controller + 每个方法上的@ResponseBody 可以将 return 的对象转为json */
 @RequestMapping("/employee")
+@Slf4j
 public class EmployeeController {
     @Autowired
     private IEmployeeService employeeService;
@@ -46,7 +48,9 @@ public class EmployeeController {
     }
 
     @GetMapping("/page")
-    public Result<DataPage<EmployeeDTO>> getPage(@Param("page") Integer page, @Param("pageSize") Integer pageSize) {
-        return employeeService.getPage(page, pageSize);
+    public Result<Page> getPage(@Param("page") Integer page,
+                                @Param("pageSize") Integer pageSize,
+                                @Param("name") String name) {
+        return employeeService.getPage(page, pageSize, name);
     }
 }

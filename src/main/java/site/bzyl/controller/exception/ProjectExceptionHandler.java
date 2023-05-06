@@ -17,6 +17,7 @@ public class ProjectExceptionHandler {
     public Result exceptionHandler(Exception e) {
 
         log.error(e.getMessage());
+        e.printStackTrace();
         return Result.error("服务器异常，请重试！");
     }
 }
