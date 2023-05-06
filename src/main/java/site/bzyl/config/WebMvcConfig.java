@@ -34,8 +34,9 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/backend/page/**", "/backend/index.html")
-                .excludePathPatterns("/backend/page/login/**");
+                .addPathPatterns("/page/**", "/backend/index.html", "/employee")
+                .excludePathPatterns("/employee/login/", "/employee/logout");
+
     }
 
     /**

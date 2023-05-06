@@ -62,6 +62,7 @@ public class EmployeeController {
      */
     @PutMapping
     public Result<String> updateEmployee(HttpServletRequest request, @RequestBody Employee employee) {
+        log.info("当前线程id：{}", Thread.currentThread().getId());
         return employeeService.updateEmployee(request, employee);
     }
 

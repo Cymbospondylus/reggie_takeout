@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.info("当前线程id：{}", Thread.currentThread().getId());
         Long id = (Long) request.getSession().getAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID);
-
         // 未登录
         if (id == null) {
             // 后端自己重定向，视频里用过滤器有点麻烦，写的和前端耦合度太高
@@ -29,7 +29,6 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         }
         // 已登录
-        log.debug(id.toString());
         return true;
     }
 }

@@ -30,12 +30,11 @@ public class Employee implements Serializable {
     private String sex;
     private String idNumber;
     private Integer status;
-    // todo 为什么用 LocalDateTime 不用 Date
+    // TableField是表字段标识注解, fill属性指定字段的自动填充策略
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
+    @TableField(fill = FieldFill .INSERT_UPDATE)
     private LocalDateTime updateTime;
-
-    // todo 将来会讲TableField
     @TableField(fill = FieldFill.INSERT)
     private Long createUser;
     @TableField(fill = FieldFill.INSERT_UPDATE)
