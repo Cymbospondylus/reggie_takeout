@@ -23,7 +23,6 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        log.info("MvcConfig配置静态资源...");
         // 默认只能访问static和template目录下的静态资源，其他的要自己配置 「classpath:」指的是resources目录下
         // 配置静态资源映射
         registry.addResourceHandler("/backend/**")

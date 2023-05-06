@@ -64,4 +64,9 @@ public class EmployeeController {
     public Result<String> updateEmployee(HttpServletRequest request, @RequestBody Employee employee) {
         return employeeService.updateEmployee(request, employee);
     }
+
+    @GetMapping("/{id}")
+    public Result<Employee> getById(@PathVariable Long id) {
+        return Result.success(employeeService.getById(id));
+    }
 }
