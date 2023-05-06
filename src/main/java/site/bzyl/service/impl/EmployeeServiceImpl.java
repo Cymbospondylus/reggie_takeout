@@ -97,6 +97,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
 
         // 条件构造器
         LambdaQueryWrapper<Employee> lqw = new LambdaQueryWrapper<>();
+
         // MP提供的条件查询api, 使用 condition 就能比 if(name != null) 更优雅地判空
         // 声明 queryWrapper 的时候要记得加泛型<Employee> 否则不能用方法引用, like 的参数列表会变为 (boolean condition, R column, Object val)
         lqw.like(StringUtils.isNotEmpty(name), Employee::getName, name);
@@ -107,5 +108,23 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         page(pageInfo, lqw);
 
         return Result.success(pageInfo);
+    }
+
+    @Override
+    public Result<String> updateEmployee(HttpServletRequest request, Employee employee) {
+        // 获得当前操作修改的管理员信息
+        Long id = (Long) request.getSession().getAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID);
+        employee.setUpdateUser(id);
+
+        // 获取当前修改时间
+        employee.setUpdateTime(LocalDateTime.now());
+
+        // 根据 employee的id修改status为传入值
+        boolean result = updateById(employee);
+
+        if (result)
+            return Result.success("修改成功!");
+
+        return Result.error("修改失败, 请重试！");
     }
 }

@@ -1,12 +1,18 @@
 package site.bzyl.config;
 
+import ch.qos.logback.classic.pattern.MessageConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import site.bzyl.commom.JacksonObjectMapper;
 import site.bzyl.controller.interceptor.LoginInterceptor;
+
+import java.util.List;
 
 
 @Configuration
@@ -31,5 +37,19 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/backend/page/**", "/backend/index.html")
                 .excludePathPatterns("/backend/page/login/**");
+    }
+
+    /**
+     * 扩展SpringMVC框架的消息转换器
+     * @param converters
+     */
+    @Override
+    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        // 创建一个自定义的消息转换器对象
+        MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+        // 设置对象转换器，底层使用JackSon将Java对象序列化为json
+        messageConverter.setObjectMapper(new JacksonObjectMapper());
+        // 将消息转换器对象追加到SpringMVC默认的转换器集合, index为0表示添加到首位，优先执行自定义的转换器
+        converters.add(0, messageConverter);
     }
 }

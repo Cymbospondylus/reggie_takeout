@@ -39,9 +39,12 @@ public class EmployeeController {
         return Result.success("退出成功!");
     }
 
-    /*
-    * 新增员工
-    * */
+    /**
+     * 新增员工
+     * @param request
+     * @param employee
+     * @return
+     */
     @PostMapping
     public Result<String> addEmployee(HttpServletRequest request, @RequestBody Employee employee) {
         return employeeService.addEmployee(request, employee);
@@ -52,5 +55,13 @@ public class EmployeeController {
                                 @Param("pageSize") Integer pageSize,
                                 @Param("name") String name) {
         return employeeService.getPage(page, pageSize, name);
+    }
+
+    /**
+     * 编辑员工信息（可以和 启用/禁用员工功能 复用）
+     */
+    @PutMapping
+    public Result<String> updateEmployee(HttpServletRequest request, @RequestBody Employee employee) {
+        return employeeService.updateEmployee(request, employee);
     }
 }
