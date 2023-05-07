@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import site.bzyl.commom.Result;
 import site.bzyl.controller.exception.BusinessException;
 import site.bzyl.dao.CategoryMapper;
-import site.bzyl.dao.DishMapper;
-import site.bzyl.dao.SetmealMapper;
 import site.bzyl.domain.Category;
 import site.bzyl.domain.Dish;
 import site.bzyl.domain.Setmeal;
 import site.bzyl.service.ICategoryService;
 import site.bzyl.service.IDishService;
 import site.bzyl.service.ISetmealService;
+
+import java.util.List;
 
 @Service
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements ICategoryService {
@@ -60,6 +60,15 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
         removeById(id);
         return Result.success("删除成功！");
+    }
+
+    @Override
+    public Result<List> listByType(Integer type) {
+        LambdaQueryWrapper<Category> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Category::getType, type);
+        List<Category> categories = list(lqw);
+
+        return Result.success(categories);
     }
 
 

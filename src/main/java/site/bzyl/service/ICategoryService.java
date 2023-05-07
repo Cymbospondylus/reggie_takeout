@@ -5,8 +5,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import site.bzyl.commom.Result;
 import site.bzyl.domain.Category;
 
+import java.util.List;
+
 public interface ICategoryService extends IService<Category> {
     Result<IPage> getPage(Integer page, Integer pageSize);
 
     Result<String> deleteById(Long id);
+
+    Result<List> listByType(Integer type);
 }

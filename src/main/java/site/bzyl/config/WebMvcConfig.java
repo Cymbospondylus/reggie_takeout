@@ -41,20 +41,17 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         /**
          * 登录校验，未登录的用户会被重定向到登录界面
          */
-        /*registry.addInterceptor(loginInterceptor)
+        registry.addInterceptor(loginInterceptor)
                 .excludePathPatterns("/backend/page/login/**", "/demo/upload.html")
                 .addPathPatterns("/backend/page/**", "/backend/index.html")
                 .addPathPatterns("/employee")
-                .addPathPatterns("/category");*/
+                .addPathPatterns("/category");
 
         /**
          * 在新增和修改员工时，用拦截器向ThreadLocal变量中存入当前操作者id, 用于填充公共字段
          */
         registry.addInterceptor(fieldFillInterceptor)
-                .addPathPatterns("/employee")
-                .addPathPatterns("/dish")
-                .addPathPatterns("/setmeal")
-                .addPathPatterns("/category");
+                .addPathPatterns("/**");
     }
 
 

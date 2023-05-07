@@ -52,5 +52,10 @@ public class CategoryController {
         return categoryService.deleteById(id);
     }
 
+    @GetMapping("/list")
+    public Result<List> list(@Param("type") Integer type) {
+        return categoryService.listByType(type);
+    }
+
 }
 
