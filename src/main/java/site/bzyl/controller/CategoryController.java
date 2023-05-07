@@ -48,10 +48,8 @@ public class CategoryController {
     }
 
     @DeleteMapping
-    public Result<String> deleteById(@Param("ids") Long ids) {
-        log.info("ids:{}", ids);
-        categoryService.removeById(ids);
-        return Result.success("删除成功！");
+    public Result<String> deleteById(@Param("id") Long id) {
+        return categoryService.deleteById(id);
     }
 
 }

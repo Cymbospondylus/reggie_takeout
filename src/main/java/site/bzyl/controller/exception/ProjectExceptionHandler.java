@@ -12,7 +12,22 @@ import site.bzyl.commom.Result;
 @Slf4j
 @Order(0)
 public class ProjectExceptionHandler {
+    /**
+     * 业务异常
+     * @param exception
+     * @return
+     */
+    @ExceptionHandler(BusinessException.class)
+    public Result BusinessExceptionHandler(BusinessException exception) {
+        log.error(exception.getMessage());
+        return Result.error(exception.getMessage());
+    }
 
+    /**
+     * 全局异常
+     * @param e
+     * @return
+     */
     @ExceptionHandler(Exception.class)
     public Result exceptionHandler(Exception e) {
 
