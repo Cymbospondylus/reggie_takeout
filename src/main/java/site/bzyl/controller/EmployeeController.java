@@ -61,9 +61,8 @@ public class EmployeeController {
      * 编辑员工信息（可以和 启用/禁用员工功能 复用）
      */
     @PutMapping
-    public Result<String> updateEmployee(HttpServletRequest request, @RequestBody Employee employee) {
-        log.info("当前线程id：{}", Thread.currentThread().getId());
-        return employeeService.updateEmployee(request, employee);
+    public Result updateEmployee(@RequestBody Employee employee) {
+        return Result.success(employeeService.updateById(employee));
     }
 
     @GetMapping("/{id}")

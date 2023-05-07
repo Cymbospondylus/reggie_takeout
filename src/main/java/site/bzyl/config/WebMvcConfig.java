@@ -10,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import site.bzyl.commom.JacksonObjectMapper;
+import site.bzyl.controller.interceptor.FieldFillInterceptor;
 import site.bzyl.controller.interceptor.LoginInterceptor;
 
 import java.util.List;
@@ -21,6 +22,9 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Autowired /* 和添加资源直接输入路径不同，添加拦截器需要Interceptor对象，要自己注入 */
     private LoginInterceptor loginInterceptor;
 
+    @Autowired
+    private FieldFillInterceptor fieldFillInterceptor;
+
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 默认只能访问static和template目录下的静态资源，其他的要自己配置 「classpath:」指的是resources目录下
@@ -31,13 +35,24 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .addResourceLocations("classpath:/front/");
     }
 
+
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
+        /**
+         * 登录校验，未登录的用户会被重定向到登录界面
+         */
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/page/**", "/backend/index.html", "/employee")
-                .excludePathPatterns("/employee/login/", "/employee/logout");
+                .addPathPatterns("/backend/page/**", "/backend/index.html")
+                .excludePathPatterns("/backend/page/login/**");
 
+        /**
+         * 在新增和修改员工时，用拦截器向ThreadLocal变量中存入当前操作者id, 用于填充公共字段
+         */
+        registry.addInterceptor(fieldFillInterceptor)
+                .addPathPatterns("/employee");
     }
+
+
 
     /**
      * 扩展SpringMVC框架的消息转换器

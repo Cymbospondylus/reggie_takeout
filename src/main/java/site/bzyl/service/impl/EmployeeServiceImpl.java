@@ -19,9 +19,6 @@ import site.bzyl.service.IEmployeeService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @Slf4j
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements IEmployeeService {
@@ -68,27 +65,11 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
 
     @Override
     public Result<String> addEmployee(HttpServletRequest request, Employee employee) {
-
-
         // 设置默认密码 123456 todo 应当修改为身份证后四位MD5加密
         String password = DigestUtils.md5DigestAsHex("123456".getBytes());
         employee.setPassword(password);
 
-        // 设置 创建时间 和 修改时间 为 当前时间
-        LocalDateTime now = LocalDateTime.now();
-        employee.setCreateTime(now);
-        employee.setUpdateTime(now);
-
-        // 设置 创建人 和 修改人 为 当前管理员用户
-        Long currentEmployeeId = (Long) request.getSession().getAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID);
-        employee.setCreateUser(currentEmployeeId);
-        employee.setUpdateUser(currentEmployeeId);
-
-        boolean result = save(employee);
-
-        if (!result) {
-            return Result.error("添加员工失败！");
-        }
+        save(employee);
 
         return Result.success("添加成功！");
     }
@@ -114,21 +95,5 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         return Result.success(pageInfo);
     }
 
-    @Override
-    public Result<String> updateEmployee(HttpServletRequest request, Employee employee) {
-        // 获得当前操作修改的管理员信息
-        Long id = (Long) request.getSession().getAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID);
-        employee.setUpdateUser(id);
 
-        // 获取当前修改时间
-        employee.setUpdateTime(LocalDateTime.now());
-
-        // 根据 employee的id修改status为传入值
-        boolean result = updateById(employee);
-
-        if (result)
-            return Result.success("修改成功!");
-
-        return Result.error("修改失败, 请重试！");
-    }
 }
