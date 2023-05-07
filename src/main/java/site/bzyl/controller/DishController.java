@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.bzyl.commom.Result;
 import site.bzyl.domain.Dish;
+import site.bzyl.domain.DishFlavor;
+import site.bzyl.dto.DishDTO;
 import site.bzyl.service.IDishService;
 
 import java.lang.reflect.Array;
@@ -33,10 +35,14 @@ public class DishController {
         return dishService.getPage(page, pageSize, name);
     }
 
+    /**
+     * 用DTO实现添加两个实体，不能用两个RequestBody
+     * @param dishDTO
+     * @return
+     */
     @PostMapping
-    public Result<String> addDish(@RequestBody Dish dish) {
-        dishService.save(dish);
-        return Result.success("添加成功！");
+    public Result<String> addDish(@RequestBody DishDTO dishDTO) {
+        return dishService.addDish(dishDTO);
     }
 
     /**
@@ -53,5 +59,10 @@ public class DishController {
     @DeleteMapping
     public Result<String> delete(@Param("ids") String ids) {
         return dishService.deleteByIds(ids);
+    }
+
+    @GetMapping("/{id}")
+    public Result<Dish> getById(@PathVariable Long id) {
+        return Result.success(dishService.getById(id));
     }
 }

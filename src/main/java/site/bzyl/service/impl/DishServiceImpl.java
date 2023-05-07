@@ -6,10 +6,15 @@ import com.baomidou.mybatisplus.core.injector.methods.SelectBatchByIds;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.dao.DishMapper;
 import site.bzyl.domain.Dish;
+import site.bzyl.domain.DishFlavor;
+import site.bzyl.dto.DishDTO;
+import site.bzyl.service.IDishFlavorService;
 import site.bzyl.service.IDishService;
 
 import java.util.ArrayList;
@@ -18,6 +23,10 @@ import java.util.List;
 
 @Service
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements IDishService {
+    // 注入dishFlavorService添加菜品口味
+    @Autowired
+    private IDishFlavorService dishFlavorService;
+
     @Override
     public Result<IPage> getPage(Integer page, Integer pageSize, String name) {
         // 条件
@@ -54,5 +63,20 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         removeByIds(Arrays.asList(ids.split(",")));
         Arrays.asList(ids);
         return Result.success("删除成功！");
+    }
+
+    @Override
+    public Result<String> addDish(DishDTO dishDTO) {
+        // 添加菜品
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        save(dish);
+
+        // 添加口味
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        flavors.forEach(flavor -> flavor.setDishId(dish.getId()));
+        dishFlavorService.saveBatch(flavors);
+
+        return Result.success("添加成功！");
     }
 }

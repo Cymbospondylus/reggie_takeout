@@ -52,6 +52,11 @@ public class CategoryController {
         return categoryService.deleteById(id);
     }
 
+    /**
+     * 根据类型查询分类
+     * @param type
+     * @return
+     */
     @GetMapping("/list")
     public Result<List> list(@Param("type") Integer type) {
         return categoryService.listByType(type);
