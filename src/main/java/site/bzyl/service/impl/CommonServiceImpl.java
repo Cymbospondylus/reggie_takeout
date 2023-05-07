@@ -6,7 +6,10 @@ import org.springframework.web.multipart.MultipartFile;
 import site.bzyl.commom.Result;
 import site.bzyl.service.ICommonService;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -42,5 +45,29 @@ public class CommonServiceImpl implements ICommonService {
         }
 
         return Result.success(fileName);
+    }
+
+    @Override
+    public void download(String name, HttpServletResponse response) {
+        try {
+            // 创建文件输入流
+            FileInputStream fileInputStream = new FileInputStream(basePath + name);
+            // 获取文件输出流
+            ServletOutputStream outputStream = response.getOutputStream();
+            // 定义缓冲区和长度
+            byte[] bytes = new byte[1024];
+            int len;
+            // 缓冲区bytes从输入流读入，如果缓冲区还有数据，则写入输出流并刷新到页面上
+            while ((len = fileInputStream.read(bytes)) > 0) {
+                outputStream.write(bytes, 0, len);
+                outputStream.flush();
+            }
+            // 释放资源
+            fileInputStream.close();
+            outputStream.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
