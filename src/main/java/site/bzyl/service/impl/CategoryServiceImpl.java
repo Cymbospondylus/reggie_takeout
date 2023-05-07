@@ -24,7 +24,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         LambdaQueryWrapper<Category> lqw = new LambdaQueryWrapper<>();
         lqw.orderByAsc(Category::getSort);
 
-        categoryMapper.selectPage(pageInfo, lqw);
+        page(pageInfo, lqw);
 
         return Result.success(pageInfo);
     }
