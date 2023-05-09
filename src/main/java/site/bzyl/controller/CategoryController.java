@@ -56,6 +56,7 @@ public class CategoryController {
      * @param type
      * @return
      */
+    // todo 这里的list方法感觉和dish同理，可以改的更加通用
     @GetMapping("/list")
     public Result<List> list(@Param("type") Integer type) {
         return categoryService.listByType(type);

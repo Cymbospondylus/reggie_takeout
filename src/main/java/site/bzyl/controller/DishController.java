@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.DishDTO;
+import site.bzyl.entity.Dish;
 import site.bzyl.service.IDishService;
 
 import java.util.List;
@@ -68,8 +69,18 @@ public class DishController {
         return dishService.updateDishAndFlavors(dishDTO);
     }
 
+
+    /**
+     * list方法的参数可以用(@Param("categoryId) Long categoryId), 这样相当于list方法和categoryId耦合了
+     * 更加通用的做法是把url里的参数封装到「含有」这个字段的对象里，这样list方法就和某个字段解耦了
+     * 获取参数的时候可以直接使用(Dish dish)来接受参数, (没太理解为什么可以不用@RequestBody
+     * 以及第一种方法使用@Param注解好像也可以传参成功，只要参数的名字和url里的一样就可以
+     * 有空把这篇博客读了：https://www.cnblogs.com/eternityz/p/12442406.html#URL%E4%BC%A0%E5%8F%82
+     * @param dish
+     * @return
+     */
     @GetMapping("/list")
-    public Result<List> list(@Param("categoryId") Long categoryId) {
-        return dishService.listByCategoryId(categoryId);
+    public Result<List> list(Dish dish) {
+        return dishService.listDishes(dish);
     }
 }

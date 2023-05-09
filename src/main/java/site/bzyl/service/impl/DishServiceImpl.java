@@ -161,10 +161,14 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
     }
 
     @Override
-    public Result<List> listByCategoryId(Long categoryId) {
+    public Result<List> listDishes(Dish dish) {
         LambdaQueryWrapper<Dish> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(Dish::getCategoryId, categoryId);
-        lqw.orderByAsc(Dish::getSort);
+        // 对要查询的条件进行判断，非空则根据该条件查询，对可能查找到的字段都进行一次判断，就可以通用地根据不同传参来实现方法复用
+        lqw.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        // 只查询起售的菜品
+        lqw.eq(Dish::getStatus, 1);
+
+        lqw.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
         List<Dish> dishList = this.list(lqw);
         return Result.success(dishList);
     }
