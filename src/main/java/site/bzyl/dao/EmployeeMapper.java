@@ -3,7 +3,7 @@ package site.bzyl.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import site.bzyl.domain.Employee;
+import site.bzyl.entity.Employee;
 
 @Mapper
 public interface EmployeeMapper extends BaseMapper<Employee> {

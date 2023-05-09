@@ -2,7 +2,7 @@ package site.bzyl.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import site.bzyl.domain.Employee;
+import site.bzyl.entity.Employee;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.EmployeeDTO;
 

@@ -1,5 +1,6 @@
 package site.bzyl.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class CommonServiceImpl implements ICommonService {
     /**
      * 不加el表达式 ${} 相当于直接复制, 而不是读取yaml里的配置属性
@@ -67,7 +69,7 @@ public class CommonServiceImpl implements ICommonService {
             outputStream.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 }

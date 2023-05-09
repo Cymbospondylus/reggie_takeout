@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import site.bzyl.domain.Employee;
-import site.bzyl.commom.Result;
+import site.bzyl.entity.Employee;
 
 @SpringBootTest
 @Slf4j

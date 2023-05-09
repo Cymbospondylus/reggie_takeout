@@ -6,10 +6,9 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.bzyl.commom.Result;
-import site.bzyl.domain.Category;
+import site.bzyl.entity.Category;
 import site.bzyl.service.ICategoryService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j

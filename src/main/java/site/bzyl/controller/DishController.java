@@ -6,13 +6,10 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.bzyl.commom.Result;
-import site.bzyl.domain.Dish;
-import site.bzyl.domain.DishFlavor;
 import site.bzyl.dto.DishDTO;
 import site.bzyl.service.IDishService;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -69,5 +66,10 @@ public class DishController {
     @PutMapping
     public Result<String> update(@RequestBody DishDTO dishDTO) {
         return dishService.updateDishAndFlavors(dishDTO);
+    }
+
+    @GetMapping("/list")
+    public Result<List> list(@Param("categoryId") Long categoryId) {
+        return dishService.listByCategoryId(categoryId);
     }
 }

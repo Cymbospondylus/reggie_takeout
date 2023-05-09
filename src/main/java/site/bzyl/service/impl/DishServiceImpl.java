@@ -2,7 +2,6 @@ package site.bzyl.service.impl;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.injector.methods.SelectBatchByIds;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.dao.DishMapper;
-import site.bzyl.domain.Category;
-import site.bzyl.domain.Dish;
-import site.bzyl.domain.DishFlavor;
+import site.bzyl.entity.Category;
+import site.bzyl.entity.Dish;
+import site.bzyl.entity.DishFlavor;
 import site.bzyl.dto.DishDTO;
 import site.bzyl.service.ICategoryService;
 import site.bzyl.service.IDishFlavorService;
@@ -159,5 +158,14 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         dishFlavorService.saveBatch(dishFlavors);
 
         return Result.success("修改成功！");
+    }
+
+    @Override
+    public Result<List> listByCategoryId(Long categoryId) {
+        LambdaQueryWrapper<Dish> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Dish::getCategoryId, categoryId);
+        lqw.orderByAsc(Dish::getSort);
+        List<Dish> dishList = this.list(lqw);
+        return Result.success(dishList);
     }
 }

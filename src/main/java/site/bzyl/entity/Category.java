@@ -1,4 +1,4 @@
-package site.bzyl.domain;
+package site.bzyl.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;

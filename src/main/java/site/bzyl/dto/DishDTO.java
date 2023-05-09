@@ -1,8 +1,8 @@
 package site.bzyl.dto;
 
 import lombok.Data;
-import site.bzyl.domain.Dish;
-import site.bzyl.domain.DishFlavor;
+import site.bzyl.entity.Dish;
+import site.bzyl.entity.DishFlavor;
 
 import java.util.ArrayList;
 import java.util.List;
