@@ -62,7 +62,12 @@ public class DishController {
     }
 
     @GetMapping("/{id}")
-    public Result<Dish> getById(@PathVariable Long id) {
-        return Result.success(dishService.getById(id));
+    public Result<DishDTO> getById(@PathVariable Long id) {
+        return dishService.getDishAndFlavors(id);
+    }
+
+    @PutMapping
+    public Result<String> update(@RequestBody DishDTO dishDTO) {
+        return dishService.updateDishAndFlavors(dishDTO);
     }
 }

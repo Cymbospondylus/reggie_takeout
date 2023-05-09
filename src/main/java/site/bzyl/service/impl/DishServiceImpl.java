@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.dao.DishMapper;
+import site.bzyl.domain.Category;
 import site.bzyl.domain.Dish;
 import site.bzyl.domain.DishFlavor;
 import site.bzyl.dto.DishDTO;
@@ -44,16 +45,24 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         // 查询
         page(pageInfo, lqw);
 
-        Page<DishDTO> dishDTOPage = new Page<>();
         // 构造一个DTO泛型的Page对象，尽量拷贝大的集合，而不是一条数据一条数据去拷贝
+        Page<DishDTO> dishDTOPage = new Page<>();
+        // 可以选择忽略属性拷贝，自己手动拷贝
         BeanUtils.copyProperties(pageInfo, dishDTOPage, "records");
         // 将pageInfo的records中的每条数据都拷贝到dishDTOList并根据id查询分类名称
         List<DishDTO> dishDTOList = pageInfo.getRecords().stream()
                 .map((dish) -> {
+                    // 用stream的map代替forEach操作
                     DishDTO dishDTO = new DishDTO();
                     BeanUtils.copyProperties(dish, dishDTO);
-                    // todo 把这里再理解理解
-                    dishDTO.setCategoryName(categoryService.getById(dish.getCategoryId()).getName());
+
+                    Long categoryId = dishDTO.getCategoryId();
+
+                    Category category = categoryService.getById(categoryId);
+                    if (category != null) {
+                        dishDTO.setCategoryName(category.getName());
+                    }
+
                     return dishDTO;
                 }).collect(Collectors.toList());
         // 返回DTO泛型的page，这个很巧妙
@@ -79,8 +88,17 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
 
     @Override
     public Result<String> deleteByIds(String ids) {
-        removeByIds(Arrays.asList(ids.split(",")));
-        Arrays.asList(ids);
+        // 将Param传递的id拆分，根据id批量删除dish
+        List<String> idList = Arrays.asList(ids.split(","));
+        removeByIds(idList);
+        // 根据id删除dishFlavors
+        idList.forEach(dishId -> {
+                    LambdaQueryWrapper<DishFlavor> lqw = new LambdaQueryWrapper<>();
+                    lqw.eq(DishFlavor::getDishId, dishId);
+                    dishFlavorService.list(lqw).forEach(flavor -> {
+                                dishFlavorService.removeById(flavor.getId());
+                            });
+                });
         return Result.success("删除成功！");
     }
 
@@ -101,5 +119,35 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         dishFlavorService.saveBatch(flavors);
 
         return Result.success("添加成功！");
+    }
+
+    @Override
+    public Result<DishDTO> getDishAndFlavors(Long id) {
+        // 根据id查询dish
+        Dish dish = getById(id);
+        // 查询dishFlavors
+        LambdaQueryWrapper<DishFlavor> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(DishFlavor::getDishId, id);
+        List<DishFlavor> flavors = dishFlavorService.list(lqw);
+
+        DishDTO dishDTO = new DishDTO();
+        BeanUtils.copyProperties(dish, dishDTO);
+        dishDTO.setFlavors(flavors);
+
+        return Result.success(dishDTO);
+    }
+
+    @Override
+    public Result<String> updateDishAndFlavors(DishDTO dishDTO) {
+        // 修改dish
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        updateById(dish);
+        // 修改dishFlavors
+        List<DishFlavor> dishFlavors = dishDTO.getFlavors();
+        dishFlavors.forEach(flavor -> flavor.setDishId(dish.getId()));
+        dishFlavorService.saveOrUpdateBatch(dishFlavors);
+
+        return Result.success("修改成功！");
     }
 }
