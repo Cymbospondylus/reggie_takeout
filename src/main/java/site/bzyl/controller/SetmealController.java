@@ -34,4 +34,8 @@ public class SetmealController {
         return setmealService.deleteByIds(ids);
     }
 
+    @PostMapping("/status/{stat}")
+    public Result<String> updateStatusByIds(@PathVariable Integer stat, @Param("ids") String ids) {
+        return setmealService.updateStatusByIds(stat, ids);
+    }
 }

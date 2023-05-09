@@ -15,6 +15,7 @@ import site.bzyl.entity.SetmealDish;
 import site.bzyl.service.ISetmealDishService;
 import site.bzyl.service.ISetmealService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,5 +72,23 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         });
 
         return Result.success("删除成功！");
+    }
+
+    @Override
+    public Result<String> updateStatusByIds(Integer stat, String ids) {
+        // 获取idList
+        List<String> idList = Arrays.asList(ids.split(","));
+        // 根据id修改Status为stat
+        ArrayList<Setmeal> setmeals = new ArrayList<>();
+        idList.forEach(id -> {
+            Setmeal setmeal = new Setmeal();
+            setmeal.setId(new Long(id));
+            setmeal.setStatus(stat);
+            setmeals.add(setmeal);
+        });
+        // 批量修改
+        this.updateBatchById(setmeals);
+
+        return Result.success("售卖状态修改成功！");
     }
 }
