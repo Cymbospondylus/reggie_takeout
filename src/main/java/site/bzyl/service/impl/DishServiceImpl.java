@@ -144,9 +144,19 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         BeanUtils.copyProperties(dishDTO, dish);
         updateById(dish);
         // 修改dishFlavors
+        Long dishId = dish.getId();
         List<DishFlavor> dishFlavors = dishDTO.getFlavors();
-        dishFlavors.forEach(flavor -> flavor.setDishId(dish.getId()));
-        dishFlavorService.saveOrUpdateBatch(dishFlavors);
+        dishFlavors.forEach(flavor -> flavor.setDishId(dishId));
+        /*dishFlavorService.saveOrUpdateBatch(dishFlavors);*/
+        LambdaQueryWrapper<DishFlavor> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(DishFlavor::getDishId, dishId);
+        List<Long> idList = dishFlavorService.list(lqw)
+                .stream()
+                .map(flavor -> flavor.getId())
+                .collect(Collectors.toList());
+        // 对于flavor字段采用先删除再新增代替修改比较好，逻辑删除没有意义
+        dishFlavorService.removeByIds(idList);
+        dishFlavorService.saveBatch(dishFlavors);
 
         return Result.success("修改成功！");
     }
