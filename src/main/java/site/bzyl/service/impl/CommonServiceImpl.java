@@ -69,7 +69,7 @@ public class CommonServiceImpl implements ICommonService {
             outputStream.close();
 
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.warn(e.getMessage());
         }
     }
 }

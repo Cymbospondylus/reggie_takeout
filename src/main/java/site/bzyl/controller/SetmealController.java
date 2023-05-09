@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import site.bzyl.commom.Result;
+import site.bzyl.dto.SetmealDTO;
 import site.bzyl.service.ISetmealService;
 
 @RestController
@@ -23,6 +22,11 @@ public class SetmealController {
                               @Param("pageSize")Integer pageSize,
                               @Param("name") String name) {
         return setmealService.getPage(page, pageSize, name);
+    }
+
+    @PostMapping
+    public Result<String> addSetmeal(@RequestBody SetmealDTO setmealDTO) {
+        return setmealService.saveSetmealWithDishes(setmealDTO);
     }
 
 }
