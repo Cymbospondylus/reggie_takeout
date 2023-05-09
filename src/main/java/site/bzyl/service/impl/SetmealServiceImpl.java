@@ -107,4 +107,23 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
         return Result.success(setmealDTO);
     }
+
+    @Override
+    public Result<String> updateBySetmealDTO(SetmealDTO setmealDTO) {
+        // 修改setmeal
+        this.updateById(setmealDTO);
+        Long setmealId = setmealDTO.getId();
+        // 菜品这种能新增也能删除的属性不适合用saveOrUpdate，数据会越来越多，最好的方法是全部删除再新增，为了不重复key舍弃逻辑删除
+        setmealDishService.list().forEach(setmealDish -> {
+            // 查询setmeal_dish表中关联setmealId的记录，全部删除后再将dto中的dishes插入
+            LambdaQueryWrapper<SetmealDish> lqw = new LambdaQueryWrapper<>();
+            lqw.eq(SetmealDish::getSetmealId, setmealId);
+            setmealDishService.remove(lqw);
+        });
+        // 设置setmealDishes的setmealId
+        setmealDTO.getSetmealDishes().forEach(setmealDish -> setmealDish.setSetmealId(setmealId));
+        // 清除原有数据后将setmealDishes插入表中完成修改
+        setmealDishService.saveBatch(setmealDTO.getSetmealDishes());
+        return Result.success("修改成功！");
+    }
 }

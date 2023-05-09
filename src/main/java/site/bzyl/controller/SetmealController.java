@@ -46,4 +46,9 @@ public class SetmealController {
     public Result<SetmealDTO> getById(@PathVariable Long id) {
         return setmealService.getSetmealDTOById(id);
     }
+
+    @PutMapping
+    public Result<String> update(@RequestBody SetmealDTO setmealDTO) {
+        return setmealService.updateBySetmealDTO(setmealDTO);
+    }
 }
