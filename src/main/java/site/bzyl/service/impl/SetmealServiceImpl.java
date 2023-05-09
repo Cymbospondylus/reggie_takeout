@@ -15,6 +15,7 @@ import site.bzyl.entity.SetmealDish;
 import site.bzyl.service.ISetmealDishService;
 import site.bzyl.service.ISetmealService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,5 +55,21 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         setmealDishService.saveOrUpdateBatch(setmealDishList);
 
         return Result.success("添加套餐成功！");
+    }
+
+    @Override
+    public Result<String> deleteByIds(String ids) {
+        // 删除套餐
+        List<String> idList = Arrays.asList(ids.split(","));
+        removeByIds(idList);
+
+        // 删除套餐-菜品表中对应该套餐的菜品
+        idList.forEach(id -> {
+            LambdaQueryWrapper<SetmealDish> lqw = new LambdaQueryWrapper<>();
+            lqw.eq(SetmealDish::getSetmealId, id);
+            setmealDishService.remove(lqw);
+        });
+
+        return Result.success("删除成功！");
     }
 }

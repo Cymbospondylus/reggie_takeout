@@ -29,4 +29,9 @@ public class SetmealController {
         return setmealService.saveSetmealWithDishes(setmealDTO);
     }
 
+    @DeleteMapping
+    public Result<String> deleteByIds(@Param("ids") String ids) {
+        return setmealService.deleteByIds(ids);
+    }
+
 }
