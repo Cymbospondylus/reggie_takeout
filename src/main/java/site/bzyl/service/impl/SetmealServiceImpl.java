@@ -91,4 +91,20 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
         return Result.success("售卖状态修改成功！");
     }
+
+    @Override
+    public Result<SetmealDTO> getSetmealDTOById(Long id) {
+        // 查询setmeal信息并封装成dto对象
+        Setmeal setmeal = this.getById(id);
+        SetmealDTO setmealDTO = new SetmealDTO();
+        BeanUtils.copyProperties(setmeal, setmealDTO);
+
+        // 创建setmealDishes并添加元素
+        setmealDTO.setSetmealDishes(new ArrayList<SetmealDish>());
+        LambdaQueryWrapper<SetmealDish> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(SetmealDish::getSetmealId, id);
+        setmealDishService.list(lqw).forEach(setmealDish -> setmealDTO.getSetmealDishes().add(setmealDish));
+
+        return Result.success(setmealDTO);
+    }
 }

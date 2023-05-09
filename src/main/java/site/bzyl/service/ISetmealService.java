@@ -17,4 +17,6 @@ public interface ISetmealService extends IService<Setmeal> {
     Result<String> deleteByIds(String ids);
 
     Result<String> updateStatusByIds(Integer stat, String ids);
+
+    Result<SetmealDTO> getSetmealDTOById(Long id);
 }

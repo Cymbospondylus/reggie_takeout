@@ -38,4 +38,12 @@ public class SetmealController {
     public Result<String> updateStatusByIds(@PathVariable Integer stat, @Param("ids") String ids) {
         return setmealService.updateStatusByIds(stat, ids);
     }
+
+    /**
+     * 根据id查单个套餐，数据回显
+     */
+    @GetMapping("/{id}")
+    public Result<SetmealDTO> getById(@PathVariable Long id) {
+        return setmealService.getSetmealDTOById(id);
+    }
 }
