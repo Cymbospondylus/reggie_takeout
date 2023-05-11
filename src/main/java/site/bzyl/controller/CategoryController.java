@@ -53,13 +53,13 @@ public class CategoryController {
 
     /**
      * 根据类型查询分类
-     * @param type
+     * @param category
      * @return
      */
-    // todo 这里的list方法感觉和dish同理，可以改的更加通用
+    // 用对象接受url传参，不需要注解，只需要对象中存在与url参数相同的字段
     @GetMapping("/list")
-    public Result<List> list(@Param("type") Integer type) {
-        return categoryService.listByType(type);
+    public Result<List> list(Category category) {
+        return categoryService.listCategories(category);
     }
 
 }

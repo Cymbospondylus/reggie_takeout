@@ -103,16 +103,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
 
     @Override
     public Result<String> addDish(DishDTO dishDTO) {
-        // todo 因为涉及到两张表的crud，所以要开启事务功能，把视频看一遍再回去复习一下springboot的事务
-
-        // 添加菜品
         // 不需要new一个新的Dish 可以用dishDTO来save新增，只填充不为null的字段
         save(dishDTO);
 
-        // todo 这里可以用Stream流优化，可以重新学习一下，前面的Ids批量删除也可以用Stream流来写，正好复习一下
         // 添加口味
-
-
         List<DishFlavor> flavors = dishDTO.getFlavors();
         flavors.forEach(flavor -> flavor.setDishId(dishDTO.getId()));
         dishFlavorService.saveBatch(flavors);

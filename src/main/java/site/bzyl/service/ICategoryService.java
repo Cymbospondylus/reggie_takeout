@@ -12,5 +12,5 @@ public interface ICategoryService extends IService<Category> {
 
     Result<String> deleteById(Long id);
 
-    Result<List> listByType(Integer type);
+    Result<List> listCategories(Category category);
 }
