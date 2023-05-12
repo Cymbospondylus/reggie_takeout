@@ -8,8 +8,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
+import site.bzyl.controller.exception.BusinessException;
 import site.bzyl.dao.SetmealMapper;
 import site.bzyl.dto.SetmealDTO;
+import site.bzyl.entity.Category;
 import site.bzyl.entity.Setmeal;
 import site.bzyl.entity.SetmealDish;
 import site.bzyl.service.ICategoryService;
@@ -45,8 +47,11 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
                     BeanUtils.copyProperties(setmeal, setmealDTO);
 
                     Long categoryId = setmealDTO.getCategoryId();
-                    setmealDTO.setCategoryName(categoryService.getById(categoryId).getName());
-
+                    // 尽量不要潜逃写, 否则getById的结果是空再调用getName就出异常了
+                    Category category = categoryService.getById(categoryId);
+                    if (category != null) {
+                        setmealDTO.setCategoryName(category.getName());
+                    }
                     return setmealDTO;
                 }).collect(Collectors.toList());
 
@@ -78,17 +83,26 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
-    public Result<String> deleteByIds(String ids) {
-        // 删除套餐
-        List<String> idList = Arrays.asList(ids.split(","));
-        removeByIds(idList);
+    public Result<String> deleteByIds(List<Long> ids) {
+        // 利用好框架能够少些if代码，用好Mybatis的关键是先想一下sql代码怎么写
+        // select count(*) from setmeal where id in (xxx, xxx)
+        LambdaQueryWrapper<Setmeal> setmealLqw = new LambdaQueryWrapper<>();
+        setmealLqw.eq(Setmeal::getStatus, 1);
+        setmealLqw.in(Setmeal::getId, ids);
 
-        // 删除套餐-菜品表中对应该套餐的菜品
-        idList.forEach(id -> {
-            LambdaQueryWrapper<SetmealDish> lqw = new LambdaQueryWrapper<>();
-            lqw.eq(SetmealDish::getSetmealId, id);
-            setmealDishService.remove(lqw);
-        });
+        // 判断起售的套餐数是否大于0即可，不需要把每条数据都查到业务层来判断
+        int count = this.count(setmealLqw);
+        if (count > 0) {
+            throw new BusinessException("删除的套餐仍在出售，请停售后重试！");
+        }
+        // 所有套餐都已停售，根据id删除
+        this.removeByIds(ids);
+
+        // 根据ids删除SetmealDish
+        // delete from setmeal_dish where setmeal_id in (xxx, xxx)
+        LambdaQueryWrapper<SetmealDish> setmealDishLqw = new LambdaQueryWrapper<>();
+        setmealDishLqw.in(SetmealDish::getSetmealId, ids);
+        setmealDishService.remove(setmealDishLqw);
 
         return Result.success("删除成功！");
     }

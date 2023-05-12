@@ -9,6 +9,8 @@ import site.bzyl.commom.Result;
 import site.bzyl.dto.SetmealDTO;
 import site.bzyl.service.ISetmealService;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @RequestMapping("/setmeal")
@@ -30,8 +32,9 @@ public class SetmealController {
         return setmealService.saveSetmealWithDishes(setmealDTO);
     }
 
+    // 使用@RequestParam注解可以将url参数作为List对象读入，如果是作为String读入则不需要注解
     @DeleteMapping
-    public Result<String> deleteByIds(@Param("ids") String ids) {
+    public Result<String> deleteByIds(@RequestParam List<Long> ids) {
         return setmealService.deleteByIds(ids);
     }
 
