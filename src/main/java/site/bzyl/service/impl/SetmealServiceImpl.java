@@ -12,6 +12,7 @@ import site.bzyl.dao.SetmealMapper;
 import site.bzyl.dto.SetmealDTO;
 import site.bzyl.entity.Setmeal;
 import site.bzyl.entity.SetmealDish;
+import site.bzyl.service.ICategoryService;
 import site.bzyl.service.ISetmealDishService;
 import site.bzyl.service.ISetmealService;
 
@@ -26,6 +27,9 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     @Autowired
     private ISetmealDishService setmealDishService;
 
+    @Autowired
+    private ICategoryService categoryService;
+
     @Override
     public Result<IPage> getPage(Integer page, Integer pageSize, String name) {
         Page<Setmeal> pageInfo = new Page<>(page, pageSize);
@@ -35,7 +39,22 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         lqw.orderByAsc(Setmeal::getUpdateTime);
         this.page(pageInfo, lqw);
 
-        return Result.success(pageInfo);
+        List<SetmealDTO> dtoList = pageInfo.getRecords().stream()
+                .map(setmeal -> {
+                    SetmealDTO setmealDTO = new SetmealDTO();
+                    BeanUtils.copyProperties(setmeal, setmealDTO);
+
+                    Long categoryId = setmealDTO.getCategoryId();
+                    setmealDTO.setCategoryName(categoryService.getById(categoryId).getName());
+
+                    return setmealDTO;
+                }).collect(Collectors.toList());
+
+        Page<SetmealDTO> DTOPage = new Page<>();
+        BeanUtils.copyProperties(pageInfo, DTOPage, "records");
+        DTOPage.setRecords(dtoList);
+
+        return Result.success(DTOPage);
     }
 
     @Override

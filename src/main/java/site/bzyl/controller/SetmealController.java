@@ -17,10 +17,11 @@ public class SetmealController {
     @Autowired
     private ISetmealService setmealService;
 
+    // @Param在controller参数名和url参数名相同时可省略
     @GetMapping("/page")
-    public Result<IPage> page(@Param("page") Integer page,
-                              @Param("pageSize")Integer pageSize,
-                              @Param("name") String name) {
+    public Result<IPage> page(/*@RequestParam("page")*/ Integer page,
+                              /*@RequestParam("pageSize")*/Integer pageSize,
+                              /*@RequestParam(value = "name", required = false)*/ String name) {
         return setmealService.getPage(page, pageSize, name);
     }
 
