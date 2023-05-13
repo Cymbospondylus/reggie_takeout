@@ -24,7 +24,7 @@ public class UserController {
     // context-type是application\json的请求体数据只能用@RequstBody接收!!
     // 其他的数据只能用@RequstParam或者Bean接收,不能用@RequstBody接收
     @PostMapping("/login")
-    public Result<String> login(@RequestBody UserDTO userDTO, HttpSession session) {
+    public Result<User> login(@RequestBody UserDTO userDTO, HttpSession session) {
         return userService.login(userDTO, session);
     }
 

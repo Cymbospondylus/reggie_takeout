@@ -1,6 +1,7 @@
 package site.bzyl.service.impl;
 
 import com.aliyuncs.utils.StringUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+
     @Override
     public Result<String> generateValidationCode(User user, HttpSession session) {
         // 简单检查手机号码是否正确
@@ -34,13 +36,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public Result<String> login(UserDTO userDTO,  HttpSession session) {
+    public Result<User> login(UserDTO userDTO, HttpSession session) {
         String validationCode = (String) session.getAttribute(userDTO.getPhone());
         // session中不存在code或者输入的验证码与session中的不同
         if (StringUtils.isEmpty(validationCode) || !validationCode.equals(userDTO.getCode())) {
             return Result.error("验证码错误，请重试！");
         }
+        // 根据电话查询用户信息
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getPhone, userDTO.getPhone());
+        User user = this.getOne(lqw);
+        // 用户第一次登录，注册新账号
+        if (user == null) {
+            user = new User();
+            user.setPhone(userDTO.getPhone());
+            user.setStatus(1);
+            this.save(user);
+        }
+
         // 登录成功
-        return Result.success("登录成功！");
+        return Result.success(user);
     }
 }

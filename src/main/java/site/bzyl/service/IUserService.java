@@ -10,5 +10,5 @@ import javax.servlet.http.HttpSession;
 public interface IUserService extends IService<User> {
     Result<String> generateValidationCode(User user, HttpSession session);
 
-    Result<String> login(UserDTO userDTO,  HttpSession session);
+    Result<User> login(UserDTO userDTO, HttpSession session);
 }
