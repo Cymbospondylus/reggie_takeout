@@ -46,6 +46,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .addPathPatterns("/backend/page/**", "/backend/index.html")
                 .addPathPatterns("/employee")
                 .addPathPatterns("/category");
+                
 
         /**
          * 在新增和修改员工时，用拦截器向ThreadLocal变量中存入当前操作者id, 用于填充公共字段
