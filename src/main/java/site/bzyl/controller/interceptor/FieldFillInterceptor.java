@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import site.bzyl.constant.HttpConstant;
-import site.bzyl.util.EmployeeHolder;
+import site.bzyl.util.BaseContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,9 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class FieldFillInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         Long id = (Long) request.getSession().getAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID);
-        EmployeeHolder.setCurrentEmployeeId(id);
+        BaseContext.setCurrentId(id);
         return true;
     }
 }
