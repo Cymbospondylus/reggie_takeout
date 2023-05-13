@@ -1,6 +1,5 @@
 package site.bzyl.config;
 
-import ch.qos.logback.classic.pattern.MessageConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +10,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import site.bzyl.commom.JacksonObjectMapper;
 import site.bzyl.controller.interceptor.FieldFillInterceptor;
-import site.bzyl.controller.interceptor.LoginInterceptor;
+import site.bzyl.controller.interceptor.BackendLoginInterceptor;
+import site.bzyl.controller.interceptor.FrontendLoginInterceptor;
 
 import java.util.List;
 
@@ -20,7 +20,10 @@ import java.util.List;
 @Slf4j
 public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Autowired /* 和添加资源直接输入路径不同，添加拦截器需要Interceptor对象，要自己注入 */
-    private LoginInterceptor loginInterceptor;
+    private BackendLoginInterceptor backendLoginInterceptor;
+
+    @Autowired
+    private FrontendLoginInterceptor frontendLoginInterceptor;
 
     @Autowired
     private FieldFillInterceptor fieldFillInterceptor;
@@ -39,14 +42,17 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
         /**
-         * 登录校验，未登录的用户会被重定向到登录界面
+         * 后台登录校验，未登录的用户会被重定向到登录界面
          */
-        registry.addInterceptor(loginInterceptor)
-                .excludePathPatterns("/backend/page/login/**", "/demo/upload.html")
-                .addPathPatterns("/backend/page/**", "/backend/index.html")
-                .addPathPatterns("/employee")
-                .addPathPatterns("/category");
-                
+        registry.addInterceptor(backendLoginInterceptor)
+                .excludePathPatterns("/backend/page/login/**",  "/demo/upload.html")
+                .addPathPatterns("/backend/page/**", "/backend/index.html", "/employee", "/category");
+
+
+        registry.addInterceptor(frontendLoginInterceptor)
+                .excludePathPatterns("/front/page/login.html", "/demo/upload.html")
+                .addPathPatterns("/front/page/**", "/front/index.html");
+
 
         /**
          * 在新增和修改员工时，用拦截器向ThreadLocal变量中存入当前操作者id, 用于填充公共字段

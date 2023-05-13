@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
+import site.bzyl.constant.HttpConstant;
 import site.bzyl.dao.UserMapper;
 import site.bzyl.dto.UserDTO;
 import site.bzyl.entity.User;
@@ -53,6 +54,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             user.setStatus(1);
             this.save(user);
         }
+        // 将当前用户存入session
+        session.setAttribute(HttpConstant.CURRENT_LOGIN_USER_ID, user.getId());
 
         // 登录成功
         return Result.success(user);
