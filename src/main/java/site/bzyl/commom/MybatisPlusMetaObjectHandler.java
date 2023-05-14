@@ -16,9 +16,9 @@ public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
         metaObject.setValue("createTime", LocalDateTime.now());
         metaObject.setValue("updateTime", LocalDateTime.now());
 
-        Long currentEmployeeId = BaseContext.getCurrentId();
-        metaObject.setValue("createUser", currentEmployeeId);
-        metaObject.setValue("updateUser", currentEmployeeId);
+        Long currentId = BaseContext.getCurrentId();
+        metaObject.setValue("createUser", currentId);
+        metaObject.setValue("updateUser", currentId);
     }
 
     @Override

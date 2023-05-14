@@ -9,8 +9,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import site.bzyl.commom.JacksonObjectMapper;
-import site.bzyl.controller.interceptor.FieldFillInterceptor;
+import site.bzyl.controller.interceptor.BackendFieldFillInterceptor;
 import site.bzyl.controller.interceptor.BackendLoginInterceptor;
+import site.bzyl.controller.interceptor.FrontendFieldFillInterceptor;
 import site.bzyl.controller.interceptor.FrontendLoginInterceptor;
 
 import java.util.List;
@@ -26,7 +27,12 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     private FrontendLoginInterceptor frontendLoginInterceptor;
 
     @Autowired
-    private FieldFillInterceptor fieldFillInterceptor;
+    private BackendFieldFillInterceptor backendFieldFillInterceptor;
+
+    @Autowired
+    private FrontendFieldFillInterceptor frontendFieldFillInterceptor;
+
+
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -51,14 +57,17 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
         registry.addInterceptor(frontendLoginInterceptor)
                 .excludePathPatterns("/front/page/login.html", "/demo/upload.html")
-                .addPathPatterns("/front/page/**", "/front/index.html");
+                .addPathPatterns("/front/page/**", "/front/index.html", "/addressBook");
 
 
         /**
          * 在新增和修改员工时，用拦截器向ThreadLocal变量中存入当前操作者id, 用于填充公共字段
          */
-        registry.addInterceptor(fieldFillInterceptor)
-                .addPathPatterns("/**");
+        registry.addInterceptor(backendFieldFillInterceptor)
+                .addPathPatterns("/backend");
+
+        registry.addInterceptor(frontendFieldFillInterceptor)
+                .addPathPatterns("/front");
     }
 
 
