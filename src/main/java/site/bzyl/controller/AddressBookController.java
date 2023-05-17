@@ -31,4 +31,9 @@ public class AddressBookController {
     public Result<String> addAddressBook(@RequestBody AddressBook addressBook, HttpSession session) {
         return addressService.addAddressBook(addressBook, session);
     }
+
+    @PutMapping("/default")
+    public Result<String> updateDefaultAddress(@RequestBody AddressBook addressBook) {
+        return null;
+    }
 }
