@@ -37,4 +37,19 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
 
         return Result.success("添加成功！");
     }
+
+    @Override
+    public Result<String> updateDefaultAddress(AddressBook addressBook) {
+        // 查询出当前默认地址, 修改为非默认地址
+        LambdaQueryWrapper<AddressBook> addressBookLqw = new LambdaQueryWrapper<>();
+        addressBookLqw.eq(AddressBook::getIsDefault, 1);
+        AddressBook defaultAddressBook = getOne(addressBookLqw);
+        defaultAddressBook.setIsDefault(0);
+
+        // 将传入的新地址设为默认地址
+        addressBook.setIsDefault(1);
+        updateById(addressBook);
+
+        return Result.success("修改默认地址成功！");
+    }
 }

@@ -34,6 +34,6 @@ public class AddressBookController {
 
     @PutMapping("/default")
     public Result<String> updateDefaultAddress(@RequestBody AddressBook addressBook) {
-        return null;
+        return addressService.updateDefaultAddress(addressBook);
     }
 }
