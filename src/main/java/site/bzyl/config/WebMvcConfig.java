@@ -67,7 +67,8 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .addPathPatterns("/backend");
 
         registry.addInterceptor(frontendFieldFillInterceptor)
-                .addPathPatterns("/front");
+                .addPathPatterns("/front")
+                .addPathPatterns("/addressBook");
     }
 
 
