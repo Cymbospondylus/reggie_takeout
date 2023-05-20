@@ -2,6 +2,7 @@ package site.bzyl.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.constant.HttpConstant;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Service
+@Slf4j
 public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBook> implements IAddressService {
     @Override
     public Result<List<AddressBook>> listAddress() {
@@ -45,7 +47,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
         addressBookLqw.eq(AddressBook::getIsDefault, 1);
         AddressBook defaultAddressBook = getOne(addressBookLqw);
         defaultAddressBook.setIsDefault(0);
-
+        log.info("[AddressServiceImpl]线程id：{}", Thread.currentThread());
         // 将传入的新地址设为默认地址
         addressBook.setIsDefault(1);
         updateById(addressBook);
