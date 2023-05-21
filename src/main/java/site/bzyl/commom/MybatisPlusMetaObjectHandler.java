@@ -23,7 +23,7 @@ public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        log.info("[updateFill]线程id：{}", Thread.currentThread());
+        log.info("[updateFill]线程id：{}", Thread.currentThread().getId());
         metaObject.setValue("updateTime", LocalDateTime.now());
         Long currentId = BaseContext.getCurrentId();
         metaObject.setValue("updateUser", currentId);
