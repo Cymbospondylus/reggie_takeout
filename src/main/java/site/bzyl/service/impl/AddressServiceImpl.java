@@ -47,7 +47,6 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
         addressBookLqw.eq(AddressBook::getIsDefault, 1);
         AddressBook defaultAddressBook = getOne(addressBookLqw);
         defaultAddressBook.setIsDefault(0);
-        log.info("[AddressServiceImpl]线程id：{}", Thread.currentThread().getId());
         // 将传入的新地址设为默认地址
         addressBook.setIsDefault(1);
         updateById(addressBook);
