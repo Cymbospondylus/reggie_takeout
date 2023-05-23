@@ -66,6 +66,9 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         registry.addInterceptor(backendFieldFillInterceptor)
                 .addPathPatterns("/backend");
 
+        /**
+         * todo 设置默认地址的时候这个拦截器不触发？？
+         */
         registry.addInterceptor(frontendFieldFillInterceptor)
                 .addPathPatterns("/front")
                 .addPathPatterns("/addressBook");

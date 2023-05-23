@@ -10,6 +10,7 @@ import site.bzyl.constant.SystemConstant;
 import site.bzyl.dao.AddressBookMapper;
 import site.bzyl.entity.AddressBook;
 import site.bzyl.service.IAddressService;
+import site.bzyl.util.BaseContext;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -42,6 +43,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
 
     @Override
     public Result<String> updateDefaultAddress(AddressBook addressBook) {
+        log.info("[AddressServiceImpl]BaseContext.getCurrentId：{}", BaseContext.getCurrentId());
         // 查询出当前默认地址, 修改为非默认地址
         LambdaQueryWrapper<AddressBook> addressBookLqw = new LambdaQueryWrapper<>();
         addressBookLqw.eq(AddressBook::getIsDefault, 1);

@@ -22,6 +22,7 @@ public class FrontendLoginInterceptor implements HandlerInterceptor {
         if (userId != null) {
             // 保存到当前线程的ThreadLocal中
             BaseContext.setCurrentId(userId);
+            log.info("[FrontendLoginInterceptor]BaseContext.getCurrentId：{}", BaseContext.getCurrentId());
             return true;
         }
 
