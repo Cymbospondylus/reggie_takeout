@@ -57,7 +57,9 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
         registry.addInterceptor(frontendLoginInterceptor)
                 .excludePathPatterns("/front/page/login.html", "/demo/upload.html")
-                .addPathPatterns("/front/page/**", "/front/index.html", "/addressBook");
+                // 必须是"/addressBook/**", 如果只拦截了"/addressBook"
+                // 那么请求"http://localhost:8080/addressBook/default"并不会填充公共字段
+                .addPathPatterns("/front/page/**", "/front/index.html", "/addressBook/**");
 
 
         /**
