@@ -36,4 +36,9 @@ public class AddressBookController {
     public Result<String> updateDefaultAddress(@RequestBody AddressBook addressBook) {
         return addressService.updateDefaultAddress(addressBook);
     }
+
+    @GetMapping("/{id}")
+    public Result<AddressBook> getById(@PathVariable Long id) {
+        return Result.success(addressService.getById(id));
+    }
 }
