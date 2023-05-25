@@ -32,13 +32,39 @@ public class AddressBookController {
         return addressService.addAddressBook(addressBook, session);
     }
 
+    /**
+     * 修改默认地址
+     * @param addressBook
+     * @return
+     */
     @PutMapping("/default")
     public Result<String> updateDefaultAddress(@RequestBody AddressBook addressBook) {
         return addressService.updateDefaultAddress(addressBook);
     }
 
+    /**
+     * 查询单个地址信息，用于修改地址时的地址回显
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public Result<AddressBook> getById(@PathVariable Long id) {
         return Result.success(addressService.getById(id));
+    }
+
+    /**
+     * 编辑收货地址并保存
+     * @param addressBook
+     * @return
+     */
+    @PutMapping
+    public Result<String> updateById(@RequestBody AddressBook addressBook) {
+        addressService.updateById(addressBook);
+        return Result.success("修改成功！");
+    }
+
+    @DeleteMapping
+    public Result<String> deleteById(@RequestParam List<Long> ids) {
+        return addressService.deleteAddressBookByIds(ids);
     }
 }

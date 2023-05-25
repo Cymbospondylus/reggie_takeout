@@ -54,11 +54,13 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/backend/page/login/**",  "/demo/upload.html")
                 .addPathPatterns("/backend/page/**", "/backend/index.html", "/employee", "/category");
 
-
+        /**
+         * 前台登录校验
+         */
         registry.addInterceptor(frontendLoginInterceptor)
                 .excludePathPatterns("/front/page/login.html", "/demo/upload.html")
                 // 必须是"/addressBook/**", 如果只拦截了"/addressBook"
-                // 那么请求"http://localhost:8080/addressBook/default"并不会填充公共字段
+                // 那么请求"http://localhost:8080/addressBook/default"并不会将当前id存入threadLocal
                 .addPathPatterns("/front/page/**", "/front/index.html", "/addressBook/**");
 
 
@@ -69,7 +71,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .addPathPatterns("/backend");
 
         /**
-         * todo 设置默认地址的时候这个拦截器不触发？？
+         * 修改地址等前台信息时，使用拦截器填充公共字段id
          */
         registry.addInterceptor(frontendFieldFillInterceptor)
                 .addPathPatterns("/front")

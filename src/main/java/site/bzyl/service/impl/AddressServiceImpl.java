@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.constant.HttpConstant;
 import site.bzyl.constant.SystemConstant;
+import site.bzyl.controller.exception.BusinessException;
 import site.bzyl.dao.AddressBookMapper;
 import site.bzyl.entity.AddressBook;
 import site.bzyl.service.IAddressService;
@@ -21,7 +22,8 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
     @Override
     public Result<List<AddressBook>> listAddress() {
         LambdaQueryWrapper<AddressBook> addressBookLqw = new LambdaQueryWrapper<>();
-        addressBookLqw.orderByDesc(AddressBook::getUpdateTime);
+        // 按照创建时间排序, 这样修改默认地址的时候不会跳来跳去
+        addressBookLqw.orderByDesc(AddressBook::getCreateTime);
 
         List<AddressBook> addressBookList = this.list(addressBookLqw);
 
@@ -55,5 +57,16 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
         updateById(addressBook);
 
         return Result.success("修改默认地址成功！");
+    }
+
+    @Override
+    public Result<String> deleteAddressBookByIds(List<Long> ids) {
+        ids.forEach(id -> {
+            if (this.getById(id).getIsDefault() == 1) {
+                throw new BusinessException("当前删除的地址为默认地址，请修改默认地址后重试！");
+            }
+        });
+        this.removeByIds(ids);
+        return Result.success("删除成功");
     }
 }
