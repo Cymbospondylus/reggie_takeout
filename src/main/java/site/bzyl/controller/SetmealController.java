@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.SetmealDTO;
+import site.bzyl.entity.Setmeal;
 import site.bzyl.service.ISetmealService;
 
 import java.util.List;
@@ -54,5 +55,10 @@ public class SetmealController {
     @PutMapping
     public Result<String> update(@RequestBody SetmealDTO setmealDTO) {
         return setmealService.updateBySetmealDTO(setmealDTO);
+    }
+
+    @GetMapping("/list")
+    public Result<List> list(Setmeal setmeal) {
+        return setmealService.listSetmeal(setmeal);
     }
 }

@@ -22,4 +22,6 @@ public interface ISetmealService extends IService<Setmeal> {
     Result<SetmealDTO> getSetmealDTOById(Long id);
 
     Result<String> updateBySetmealDTO(SetmealDTO setmealDTO);
+
+    Result<List> listSetmeal(Setmeal setmeal);
 }

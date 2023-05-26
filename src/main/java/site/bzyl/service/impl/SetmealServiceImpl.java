@@ -159,4 +159,19 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         setmealDishService.saveBatch(setmealDTO.getSetmealDishes());
         return Result.success("修改成功！");
     }
+
+    @Override
+    public Result<List> listSetmeal(Setmeal setmeal) {
+        // 条件查询
+        LambdaQueryWrapper<Setmeal> lqw = new LambdaQueryWrapper<>();
+        // 若传入的categoryId不为null, 查询所以该分类下起售的套餐
+        lqw.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
+        // 只查询在售套餐
+        lqw.eq(Setmeal::getStatus, 1);
+        // 根据创建时间排序
+        lqw.orderByAsc(Setmeal::getCreateTime);
+        List<Setmeal> setmealList = this.list(lqw);
+
+        return Result.success(setmealList);
+    }
 }
