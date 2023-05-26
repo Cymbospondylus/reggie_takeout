@@ -60,4 +60,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 登录成功
         return Result.success(user);
     }
+
+    @Override
+    public Result<String> logout(HttpSession session) {
+        // 前端做了页面跳转，所以只需要删除session里的信息就可以了
+        session.removeAttribute(HttpConstant.CURRENT_LOGIN_USER_ID);
+        return Result.success("退出成功！");
+    }
 }

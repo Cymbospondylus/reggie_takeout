@@ -11,4 +11,6 @@ public interface IUserService extends IService<User> {
     Result<String> generateValidationCode(User user, HttpSession session);
 
     Result<User> login(UserDTO userDTO, HttpSession session);
+
+    Result<String> logout(HttpSession session);
 }
