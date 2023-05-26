@@ -47,3 +47,4 @@ application.yaml
 
 /src/main/java/site/bzyl/util/SMSUtils.java
 
+/.gitignore
