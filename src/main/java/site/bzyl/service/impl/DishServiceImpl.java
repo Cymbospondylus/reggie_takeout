@@ -161,9 +161,29 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         lqw.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
         // 只查询起售的菜品
         lqw.eq(Dish::getStatus, 1);
-
+        // 按更新时间排序
         lqw.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+        // 查询
         List<Dish> dishList = this.list(lqw);
-        return Result.success(dishList);
+        // 用dishDTOList封装带有口味的菜品列表
+        // 对于实体集合到DTO集合的拷贝, 用stream流+BeanUtils的形式比较简洁
+        List<Object> dishDTOList = dishList.stream()
+                .map(dish1 -> {
+                    // 对每个dish对象都创建一个DTO对象
+                    DishDTO dishDTO = new DishDTO();
+                    // 拷贝属性
+                    BeanUtils.copyProperties(dish1, dishDTO);
+                    // 根据dishId查询口味信息
+                    LambdaQueryWrapper<DishFlavor> dishFlavorLqw = new LambdaQueryWrapper<>();
+                    dishFlavorLqw.eq(DishFlavor::getDishId, dishDTO.getId());
+                    List<DishFlavor> dishFlavors = dishFlavorService.list(dishFlavorLqw);
+                    // 若存在口味信息, 则存入DTO中返回
+                    if (dishFlavors != null && !dishFlavors.isEmpty()) {
+                        dishDTO.setFlavors(dishFlavors);
+                    }
+                    return dishDTO;
+                }).collect(Collectors.toList());
+
+        return Result.success(dishDTOList);
     }
 }

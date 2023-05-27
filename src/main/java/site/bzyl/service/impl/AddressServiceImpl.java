@@ -46,7 +46,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
     @Override
     public Result<String> updateDefaultAddress(AddressBook addressBook) {
         log.info("[AddressServiceImpl]BaseContext.getCurrentId：{}", BaseContext.getCurrentId());
-        // 查询出当前默认地址, 修改为非默认地址
+        // 将当前默认地址修改为修改为非默认地址
         LambdaUpdateWrapper<AddressBook> addressBookLuw = new LambdaUpdateWrapper<>();
         // 同一个线程可以用BaseContext直接从ThreadLocal里取userId, 不需要从session中取
         addressBookLuw.eq(AddressBook::getUserId, BaseContext.getCurrentId());
@@ -63,6 +63,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
 
         // 将传入的新地址设为默认地址
         addressBook.setIsDefault(1);
+        // sql: update address_book set is_default = 1 where user_id = ?
         updateById(addressBook);
 
         return Result.success("修改默认地址成功！");
@@ -81,11 +82,9 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
 
     @Override
     public Result<AddressBook> getDefaultAddress() {
-        // 获取当前登录用户
-        Long userId = BaseContext.getCurrentId();
         // 查询当前用户默认地址
         LambdaQueryWrapper<AddressBook> addressBookLqw = new LambdaQueryWrapper<>();
-        addressBookLqw.eq(userId != null, AddressBook::getUserId, userId);
+        addressBookLqw.eq(AddressBook::getUserId, BaseContext.getCurrentId());
         // 默认地址
         addressBookLqw.eq(AddressBook::getIsDefault, 1);
         AddressBook defaultAddress = this.getOne(addressBookLqw);

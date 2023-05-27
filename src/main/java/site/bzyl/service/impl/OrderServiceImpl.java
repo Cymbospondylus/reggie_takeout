@@ -7,6 +7,7 @@ import site.bzyl.constant.HttpConstant;
 import site.bzyl.dao.OrderMapper;
 import site.bzyl.entity.Orders;
 import site.bzyl.service.IOrderService;
+import site.bzyl.util.BaseContext;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
@@ -14,9 +15,9 @@ import java.time.LocalDateTime;
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implements IOrderService {
     @Override
-    public Result<String> submit(Orders orders, HttpSession session) {
+    public Result<String> submit(Orders orders) {
         // 获取提交订单的用户id
-        Long userId = (Long) session.getAttribute(HttpConstant.CURRENT_LOGIN_USER_ID);
+        Long userId = BaseContext.getCurrentId();
         orders.setUserId(userId);
         // 设置订单提交时间
         orders.setOrderTime(LocalDateTime.now());

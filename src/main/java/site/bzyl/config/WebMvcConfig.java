@@ -61,7 +61,9 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/front/page/login.html", "/demo/upload.html")
                 // 必须是"/addressBook/**", 如果只拦截了"/addressBook"
                 // 那么请求"http://localhost:8080/addressBook/default"并不会将当前id存入threadLocal
-                .addPathPatterns("/front/page/**", "/front/index.html", "/addressBook/**");
+                .addPathPatterns(
+                        "/front/page/**", "/front/index.html",
+                        "/addressBook/**", "/shoppingCart/**");
 
 
         /**
