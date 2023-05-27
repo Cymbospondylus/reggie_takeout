@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.SetmealDTO;
 import site.bzyl.entity.Setmeal;
+import site.bzyl.entity.SetmealDish;
 import site.bzyl.service.ISetmealService;
 
 import java.util.List;
@@ -60,5 +61,15 @@ public class SetmealController {
     @GetMapping("/list")
     public Result<List> list(Setmeal setmeal) {
         return setmealService.listSetmeal(setmeal);
+    }
+
+    /**
+     * 查询套餐里的所有菜品信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/dish/{id}")
+    public Result<List<SetmealDish>> setmealDishDetail(@PathVariable(name = "id") Long setmealId) {
+        return setmealService.setmealDishDetail(setmealId);
     }
 }

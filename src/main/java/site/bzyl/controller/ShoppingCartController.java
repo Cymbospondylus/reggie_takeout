@@ -43,4 +43,15 @@ public class ShoppingCartController {
     public Result<String> clean(HttpSession session) {
         return shoppingCartService.cleanShoppingCart(session);
     }
+
+    /**
+     * 删除购物车里的菜品
+     * @param shoppingCart
+     * @param session
+     * @return
+     */
+    @PostMapping("/sub")
+    public Result<String> sub(@RequestBody ShoppingCart shoppingCart, HttpSession session) {
+        return shoppingCartService.sub(shoppingCart, session);
+    }
 }

@@ -174,4 +174,14 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
         return Result.success(setmealList);
     }
+
+    @Override
+    public Result<List<SetmealDish>> setmealDishDetail(Long setmealId) {
+        // 根据套餐id查询包含的菜品
+        LambdaQueryWrapper<SetmealDish> setmealDishLqw = new LambdaQueryWrapper<>();
+        setmealDishLqw.eq(setmealId != null, SetmealDish::getSetmealId, setmealId);
+        List<SetmealDish> dishList = setmealDishService.list(setmealDishLqw);
+
+        return Result.success(dishList);
+    }
 }

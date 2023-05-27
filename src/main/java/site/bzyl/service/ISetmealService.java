@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import site.bzyl.commom.Result;
 import site.bzyl.dto.SetmealDTO;
 import site.bzyl.entity.Setmeal;
+import site.bzyl.entity.SetmealDish;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface ISetmealService extends IService<Setmeal> {
     Result<String> updateBySetmealDTO(SetmealDTO setmealDTO);
 
     Result<List> listSetmeal(Setmeal setmeal);
+
+    Result<List<SetmealDish>> setmealDishDetail(Long setmealId);
 }
