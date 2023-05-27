@@ -42,6 +42,11 @@ public class AddressBookController {
         return addressService.updateDefaultAddress(addressBook);
     }
 
+    /**
+     * 获取当前登录用户的默认地址
+     * @param session
+     * @return
+     */
     @GetMapping("/default")
     public Result<AddressBook> getDefaultAddress(HttpSession session) {
         return addressService.getDefaultAddress(session);
