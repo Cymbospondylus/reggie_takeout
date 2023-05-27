@@ -20,8 +20,8 @@ public class ShoppingCartController {
      * @return
      */
     @GetMapping("/list")
-    public Result<List> list() {
-        return shoppingCartService.getList();
+    public Result<List> list(HttpSession session) {
+        return shoppingCartService.getList(session);
     }
 
     /**
@@ -32,5 +32,15 @@ public class ShoppingCartController {
     @PostMapping("/add")
     public Result<String> add(@RequestBody ShoppingCart shoppingCart, HttpSession session) {
         return shoppingCartService.add(shoppingCart, session);
+    }
+
+    /**
+     * 清空购物车
+     * @param session
+     * @return
+     */
+    @DeleteMapping("/clean")
+    public Result<String> clean(HttpSession session) {
+        return shoppingCartService.cleanShoppingCart(session);
     }
 }

@@ -10,7 +10,9 @@ import java.util.List;
 
 @Transactional
 public interface IShoppingCartService extends IService<ShoppingCart> {
-    Result<List> getList();
+    Result<List> getList(HttpSession session);
 
     Result<String> add(ShoppingCart shoppingCart, HttpSession session);
+
+    Result<String> cleanShoppingCart(HttpSession session);
 }
