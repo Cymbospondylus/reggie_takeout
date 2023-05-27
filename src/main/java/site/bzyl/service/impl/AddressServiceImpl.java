@@ -69,4 +69,20 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
         this.removeByIds(ids);
         return Result.success("删除成功");
     }
+
+    @Override
+    public Result<AddressBook> getDefaultAddress(HttpSession session) {
+        // 获取当前登录用户
+        Long userId = (Long) session.getAttribute(HttpConstant.CURRENT_LOGIN_USER_ID);
+        // 查询当前用户默认地址
+        LambdaQueryWrapper<AddressBook> addressBookLqw = new LambdaQueryWrapper<>();
+        addressBookLqw.eq(userId != null, AddressBook::getUserId, userId);
+        // 默认地址
+        addressBookLqw.eq(AddressBook::getIsDefault, 1);
+        AddressBook defaultAddress = this.getOne(addressBookLqw);
+        //todo 还需要写一个无任何地址或无默认地址时跳转到新增地址
+
+        // 返回
+        return Result.success(defaultAddress);
+    }
 }

@@ -17,4 +17,6 @@ public interface IAddressService extends IService<AddressBook> {
     Result<String> updateDefaultAddress(AddressBook addressBook);
 
     Result<String> deleteAddressBookByIds(List<Long> ids);
+
+    Result<AddressBook> getDefaultAddress(HttpSession session);
 }
