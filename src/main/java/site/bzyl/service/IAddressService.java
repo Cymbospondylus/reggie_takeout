@@ -12,11 +12,11 @@ import java.util.List;
 public interface IAddressService extends IService<AddressBook> {
     Result<List<AddressBook>> listAddress();
 
-    Result<String> addAddressBook(AddressBook addressBook, HttpSession session);
+    Result<String> addAddressBook(AddressBook addressBook);
 
     Result<String> updateDefaultAddress(AddressBook addressBook);
 
     Result<String> deleteAddressBookByIds(List<Long> ids);
 
-    Result<AddressBook> getDefaultAddress(HttpSession session);
+    Result<AddressBook> getDefaultAddress();
 }

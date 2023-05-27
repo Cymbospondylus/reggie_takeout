@@ -33,11 +33,9 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
     }
 
     @Override
-    public Result<String> addAddressBook(AddressBook addressBook, HttpSession session) {
-        // 获取当前用户id
-        Long userId = (Long) session.getAttribute(HttpConstant.CURRENT_LOGIN_USER_ID);
-        addressBook.setUserId(userId);
-
+    public Result<String> addAddressBook(AddressBook addressBook) {
+        // 设置当前用户id, 从ThreadLocal中取而不是session
+        addressBook.setUserId(BaseContext.getCurrentId());
         // 条件，未来需要再写
 
         this.save(addressBook);
@@ -82,9 +80,9 @@ public class AddressServiceImpl extends ServiceImpl<AddressBookMapper, AddressBo
     }
 
     @Override
-    public Result<AddressBook> getDefaultAddress(HttpSession session) {
+    public Result<AddressBook> getDefaultAddress() {
         // 获取当前登录用户
-        Long userId = (Long) session.getAttribute(HttpConstant.CURRENT_LOGIN_USER_ID);
+        Long userId = BaseContext.getCurrentId();
         // 查询当前用户默认地址
         LambdaQueryWrapper<AddressBook> addressBookLqw = new LambdaQueryWrapper<>();
         addressBookLqw.eq(userId != null, AddressBook::getUserId, userId);

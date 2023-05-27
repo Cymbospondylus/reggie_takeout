@@ -28,8 +28,8 @@ public class AddressBookController {
      * @return
      */
     @PostMapping
-    public Result<String> addAddressBook(@RequestBody AddressBook addressBook, HttpSession session) {
-        return addressService.addAddressBook(addressBook, session);
+    public Result<String> addAddressBook(@RequestBody AddressBook addressBook) {
+        return addressService.addAddressBook(addressBook);
     }
 
     /**
@@ -48,8 +48,8 @@ public class AddressBookController {
      * @return
      */
     @GetMapping("/default")
-    public Result<AddressBook> getDefaultAddress(HttpSession session) {
-        return addressService.getDefaultAddress(session);
+    public Result<AddressBook> getDefaultAddress() {
+        return addressService.getDefaultAddress();
     }
 
     /**
