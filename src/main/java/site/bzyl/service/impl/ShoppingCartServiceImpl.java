@@ -23,10 +23,10 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 获取当前登录用户id
         Long userId = BaseContext.getCurrentId();
         // 只展示当前登录用户的购物车
-        LambdaQueryWrapper<ShoppingCart> shoppingCArtLqw = new LambdaQueryWrapper<>();
-        shoppingCArtLqw.eq(userId != null, ShoppingCart::getUserId, userId);
+        LambdaQueryWrapper<ShoppingCart> shoppingCartLqw = new LambdaQueryWrapper<>();
+        shoppingCartLqw.eq(userId != null, ShoppingCart::getUserId, userId);
         // 查询列表
-        List<ShoppingCart> shoppingCarts = this.list(shoppingCArtLqw);
+        List<ShoppingCart> shoppingCarts = this.list(shoppingCartLqw);
         // 返回
         return Result.success(shoppingCarts);
     }
