@@ -2,11 +2,14 @@ package site.bzyl.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.dao.OrderMapper;
+import site.bzyl.dto.OrdersDTO;
 import site.bzyl.entity.*;
 import site.bzyl.service.*;
 import site.bzyl.util.BaseContext;
@@ -107,5 +110,33 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         shoppingCartService.remove(shoppingCartLqw);
 
         return Result.success("订单提交成功！");
+    }
+
+    @Override
+    public Result<Page> userPage(Integer page, Integer pageSize) {
+        // 分页查询
+        Page<Orders> ordersPage = new Page<>(page, pageSize);
+        // 条件查询, 只查询当前登录用户的订单
+        LambdaQueryWrapper<Orders> ordersLqw = new LambdaQueryWrapper<>();
+        this.page(ordersPage, ordersLqw);
+        // userPage页面还需要orderDetails, 所以封装成DTO的page对象返回
+        Page<OrdersDTO> ordersDTOPage = new Page<>();
+        BeanUtils.copyProperties(ordersPage, ordersDTOPage, "records");
+        // 单独处理records
+        List<OrdersDTO> ordersDTOList = ordersPage.getRecords().stream()
+                .map(order -> {
+                    OrdersDTO ordersDTO = new OrdersDTO();
+                    BeanUtils.copyProperties(order, ordersDTO);
+                    // 通过orderId获取所有菜品信息
+                    Long orderId = order.getId();
+                    LambdaQueryWrapper<OrderDetail> orderDetailLqw = new LambdaQueryWrapper<>();
+                    orderDetailLqw.eq(OrderDetail::getOrderId, orderId);
+                    List<OrderDetail> orderDetails = orderDetailService.list(orderDetailLqw);
+                    ordersDTO.setOrderDetails(orderDetails);
+                    return ordersDTO;
+                }).collect(Collectors.toList());
+        // 将ordersDTOList存入page对象返回
+        ordersDTOPage.setRecords(ordersDTOList);
+        return Result.success(ordersDTOPage);
     }
 }
