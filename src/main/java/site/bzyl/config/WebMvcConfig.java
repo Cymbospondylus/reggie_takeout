@@ -63,7 +63,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 // 那么请求"http://localhost:8080/addressBook/default"并不会将当前id存入threadLocal
                 .addPathPatterns(
                         "/front/page/**", "/front/index.html",
-                        "/addressBook/**", "/shoppingCart/**");
+                        "/addressBook/**", "/shoppingCart/**", "/order/**");
 
 
         /**
