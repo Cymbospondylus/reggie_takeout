@@ -25,6 +25,18 @@ public class FrontendLoginInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        /**
+         * todo 这段代码是用来在后台能读到前端信息不被拦截, 但是有个bug会导致后台登录过后会在服务器保存session信息
+         * 这个时候访问前台不需要登录也可以查看菜品, 暂时还没想到好的解决方法
+         */
+        // 获取当前登录员工id
+        Long empId = (Long) request.getSession().getAttribute(HttpConstant.CURRENT_LOGIN_EMPLOYEE_ID);
+        // 当前员工已登录
+        if (empId != null) {
+            return true;
+        }
+
+
         // 当前用户未登录
         log.info("拦截到请求：{}", request.getRequestURI());
         // 重定向到用户登录界面

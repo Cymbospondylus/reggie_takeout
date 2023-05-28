@@ -14,4 +14,5 @@ public interface IOrderService extends IService<Orders> {
 
     Result<Page> userPage(Integer page, Integer pageSize);
 
+    Result<Page> backendPage(Integer page, Integer pageSize);
 }

@@ -114,10 +114,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
     @Override
     public Result<Page> userPage(Integer page, Integer pageSize) {
+        // 获取当前登录用户
+        Long userId = BaseContext.getCurrentId();
         // 分页查询
         Page<Orders> ordersPage = new Page<>(page, pageSize);
         // 条件查询, 只查询当前登录用户的订单
         LambdaQueryWrapper<Orders> ordersLqw = new LambdaQueryWrapper<>();
+        ordersLqw.eq(Orders::getUserId, userId);
+        // 按订单创建时间降序排列
+        ordersLqw.orderByDesc(Orders::getOrderTime);
         this.page(ordersPage, ordersLqw);
         // userPage页面还需要orderDetails, 所以封装成DTO的page对象返回
         Page<OrdersDTO> ordersDTOPage = new Page<>();
@@ -138,5 +143,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         // 将ordersDTOList存入page对象返回
         ordersDTOPage.setRecords(ordersDTOList);
         return Result.success(ordersDTOPage);
+    }
+
+    @Override
+    public Result<Page> backendPage(Integer page, Integer pageSize) {
+        // 分页查询
+        Page<Orders> ordersPage = new Page<>(page, pageSize);
+        // 按订单创建时间降序排列
+        LambdaQueryWrapper<Orders> ordersLqw = new LambdaQueryWrapper<>();
+        ordersLqw.orderByDesc(Orders::getOrderTime);
+        this.page(ordersPage, ordersLqw);
+        return Result.success(ordersPage);
     }
 }
