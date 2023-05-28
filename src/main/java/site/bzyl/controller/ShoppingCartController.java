@@ -36,12 +36,12 @@ public class ShoppingCartController {
 
     /**
      * 清空购物车
-     * @param session
+     * @param
      * @return
      */
     @DeleteMapping("/clean")
-    public Result<String> clean(HttpSession session) {
-        return shoppingCartService.cleanShoppingCart(session);
+    public Result<String> clean() {
+        return shoppingCartService.cleanShoppingCart();
     }
 
     /**

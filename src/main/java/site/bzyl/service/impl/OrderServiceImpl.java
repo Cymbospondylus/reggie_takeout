@@ -102,7 +102,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         orderDetailService.saveBatch(orderDetails);
 
 
-        // todo 清空购物车
+        // 清空购物车, Lqw已经定义了eq当前用户id
+        /*shoppingCartService.cleanShoppingCart();*/
+        shoppingCartService.remove(shoppingCartLqw);
+
         return Result.success("订单提交成功！");
     }
 }

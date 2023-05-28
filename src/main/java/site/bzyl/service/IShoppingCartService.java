@@ -14,7 +14,7 @@ public interface IShoppingCartService extends IService<ShoppingCart> {
 
     Result<String> add(ShoppingCart shoppingCart);
 
-    Result<String> cleanShoppingCart(HttpSession session);
+    Result<String> cleanShoppingCart();
 
     Result<String> sub(ShoppingCart shoppingCart, HttpSession session);
 

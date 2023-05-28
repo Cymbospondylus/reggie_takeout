@@ -72,7 +72,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     }
 
     @Override
-    public Result<String> cleanShoppingCart(HttpSession session) {
+    public Result<String> cleanShoppingCart() {
         // 获取当前登录用户id
         Long userId = BaseContext.getCurrentId();
         // 根据用户id删除所有购物车记录
