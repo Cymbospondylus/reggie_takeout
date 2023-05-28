@@ -167,7 +167,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         // 若传入的categoryId不为null, 查询所以该分类下起售的套餐
         lqw.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
         // 只查询在售套餐
-        lqw.eq(Setmeal::getStatus, 1);
+        lqw.eq(setmeal.getCategoryId() != null, Setmeal::getStatus, 1);
         // 根据创建时间排序
         lqw.orderByAsc(Setmeal::getCreateTime);
         List<Setmeal> setmealList = this.list(lqw);

@@ -12,15 +12,16 @@ import site.bzyl.service.IShoppingCartService;
 import site.bzyl.util.BaseContext;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, ShoppingCart> implements IShoppingCartService {
 
     @Override
-    public Result<List> getList(HttpSession session) {
+    public Result<List> getList() {
         // 获取当前登录用户id
-        Long userId = (Long) session.getAttribute(HttpConstant.CURRENT_LOGIN_USER_ID);
+        Long userId = BaseContext.getCurrentId();
         // 只展示当前登录用户的购物车
         LambdaQueryWrapper<ShoppingCart> shoppingCArtLqw = new LambdaQueryWrapper<>();
         shoppingCArtLqw.eq(userId != null, ShoppingCart::getUserId, userId);
@@ -31,7 +32,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     }
 
     @Override
-     public synchronized Result<String> add(ShoppingCart shoppingCart, HttpSession session) {
+     public synchronized Result<String> add(ShoppingCart shoppingCart) {
         LambdaQueryWrapper<ShoppingCart> shoppingCartLqw = new LambdaQueryWrapper<>();
         // 必须是当前用户购物车里的, 如果能查出记录说明购物车已有该商品, 数量加一
         Long userId = BaseContext.getCurrentId();
@@ -61,6 +62,8 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             if (shoppingCart != null) {
                 shoppingCart.setUserId(userId);
             }
+            // 设置创建时间为当前时间, 因为字段不一样, 和其他实体使用公共字段注入会出问题(没有updateTime)
+            shoppingCart.setCreateTime(LocalDateTime.now());
             // 添加到购物车中
             this.save(shoppingCart);
         }

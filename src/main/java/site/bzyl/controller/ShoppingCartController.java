@@ -20,8 +20,8 @@ public class ShoppingCartController {
      * @return
      */
     @GetMapping("/list")
-    public Result<List> list(HttpSession session) {
-        return shoppingCartService.getList(session);
+    public Result<List> list() {
+        return shoppingCartService.getList();
     }
 
     /**
@@ -30,8 +30,8 @@ public class ShoppingCartController {
      * @return
      */
     @PostMapping("/add")
-    public Result<String> add(@RequestBody ShoppingCart shoppingCart, HttpSession session) {
-        return shoppingCartService.add(shoppingCart, session);
+    public Result<String> add(@RequestBody ShoppingCart shoppingCart) {
+        return shoppingCartService.add(shoppingCart);
     }
 
     /**
