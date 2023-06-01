@@ -4,6 +4,8 @@ import com.aliyuncs.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.constant.HttpConstant;
@@ -14,11 +16,14 @@ import site.bzyl.service.IUserService;
 import site.bzyl.util.ValidateCodeUtils;
 
 import javax.servlet.http.HttpSession;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
     @Override
     public Result<String> generateValidationCode(User user, HttpSession session) {
         // 简单检查手机号码是否正确
@@ -30,33 +35,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String code = ValidateCodeUtils.generateValidateCode(6).toString();
         log.info("验证码：{}", code);
         /*SMSUtils.sendMessage(SystemConstant.SING_NAME, SystemConstant.TEMPLATE_CODE, phone, code);*/
-        // 将手机号和验证码存入Session
-        session.setAttribute(phone, code);
-        // 返回结果信息
+        // 将手机号和验证码存入Redis缓存, 过期时间五分钟
+        redisTemplate.opsForValue().set(phone, code, 5, TimeUnit.MINUTES);
+        // 返回结果信息, 在前端弹出窗口代替发送短信
         return Result.success(code);
     }
 
     @Override
     public Result<User> login(UserDTO userDTO, HttpSession session) {
-        String validationCode = (String) session.getAttribute(userDTO.getPhone());
-        // session中不存在code或者输入的验证码与session中的不同
+        // 获取手机号
+        String phone = userDTO.getPhone();
+        // 根据手机号码从Redis中获取验证码
+        String validationCode = redisTemplate.opsForValue().get(phone);
+        // Redis中不存在code或者输入的验证码与session中的不同
         if (StringUtils.isEmpty(validationCode) || !validationCode.equals(userDTO.getCode())) {
             return Result.error("验证码错误，请重试！");
         }
         // 根据电话查询用户信息
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(User::getPhone, userDTO.getPhone());
+        lqw.eq(User::getPhone, phone);
         User user = this.getOne(lqw);
         // 用户第一次登录，注册新账号
         if (user == null) {
             user = new User();
-            user.setPhone(userDTO.getPhone());
+            user.setPhone(phone);
             user.setStatus(1);
             this.save(user);
         }
         // 将当前用户存入session
         session.setAttribute(HttpConstant.CURRENT_LOGIN_USER_ID, user.getId());
-
+        // 登陆成功后删除验证码
+        redisTemplate.delete(phone);
         // 登录成功
         return Result.success(user);
     }
