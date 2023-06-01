@@ -33,7 +33,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 将手机号和验证码存入Session
         session.setAttribute(phone, code);
         // 返回结果信息
-        return Result.success("验证码发送成功！");
+        return Result.success(code);
     }
 
     @Override
