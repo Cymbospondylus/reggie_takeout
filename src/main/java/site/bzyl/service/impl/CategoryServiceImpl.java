@@ -21,6 +21,7 @@ import site.bzyl.service.IDishService;
 import site.bzyl.service.ISetmealService;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements ICategoryService {
@@ -70,6 +71,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     public Result<List> listCategories(Category category) {
         // 从缓存中查找categories
+        // todo 增删改操作后应该清空缓存, 怎么高效地给增删改方法添加一个清除缓存的功能呢
         String categoryList = redisTemplate.opsForValue().get(RedisCacheConstant.CATEGORY_LIST);
         //反序列化为List
         List<Category> categories = JSONArray.parseArray(categoryList, Category.class);
@@ -84,7 +86,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         lqw.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
         categories = list(lqw);
         // 将查询到的结果存入Redis缓存中
-        redisTemplate.opsForValue().set(RedisCacheConstant.CATEGORY_LIST, JSON.toJSONString(categories));
+        redisTemplate.opsForValue().set(RedisCacheConstant.CATEGORY_LIST, JSON.toJSONString(categories),
+                30, TimeUnit.MINUTES);
         return Result.success(categories);
     }
 

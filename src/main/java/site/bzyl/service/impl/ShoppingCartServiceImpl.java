@@ -1,10 +1,14 @@
 package site.bzyl.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.constant.HttpConstant;
+import site.bzyl.constant.RedisCacheConstant;
 import site.bzyl.controller.exception.BusinessException;
 import site.bzyl.dao.ShoppingCartMapper;
 import site.bzyl.entity.ShoppingCart;
@@ -14,16 +18,20 @@ import site.bzyl.util.BaseContext;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, ShoppingCart> implements IShoppingCartService {
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     public Result<List> getList() {
         // 获取当前登录用户id
         Long userId = BaseContext.getCurrentId();
-        // 只展示当前登录用户的购物车
+        // 从数据库中查询(购物车数据写入频繁, 不存入缓存)
         LambdaQueryWrapper<ShoppingCart> shoppingCartLqw = new LambdaQueryWrapper<>();
+        // 只查询当前登录用户的购物车信息
         shoppingCartLqw.eq(userId != null, ShoppingCart::getUserId, userId);
         // 查询列表
         List<ShoppingCart> shoppingCarts = this.list(shoppingCartLqw);
@@ -79,15 +87,18 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         LambdaQueryWrapper<ShoppingCart> shoppingCartLqw = new LambdaQueryWrapper<>();
         shoppingCartLqw.eq(ShoppingCart::getUserId, userId);
         this.remove(shoppingCartLqw);
+
+
         // 响应结果
         return Result.success("清空购物车成功！");
     }
 
     @Override
      public synchronized Result<String> sub(ShoppingCart shoppingCart, HttpSession session) {
+        Long userId = BaseContext.getCurrentId();
         LambdaQueryWrapper<ShoppingCart> shoppingCartLqw = new LambdaQueryWrapper<>();
         // 查询当前用户购物车里的
-        shoppingCartLqw.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
+        shoppingCartLqw.eq(ShoppingCart::getUserId, userId);
         // 根据SetmealId查询, 这里前面必须要判空, 否则两个eq条件都加上的话查出来的永远是null
         shoppingCartLqw.eq(shoppingCart.getSetmealId() != null,
                 ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
@@ -117,6 +128,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             // 若购物车中没有该商品
             throw new BusinessException("删除失败, 购物车中没有该菜品！");
         }
+
 
         return Result.success("添加成功！");
     }

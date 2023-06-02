@@ -1,14 +1,17 @@
 package site.bzyl.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
+import site.bzyl.constant.RedisCacheConstant;
 import site.bzyl.dao.DishMapper;
 import site.bzyl.entity.Category;
 import site.bzyl.entity.Dish;
@@ -21,6 +24,7 @@ import site.bzyl.service.IDishService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,10 +32,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
     // 注入dishFlavorService添加菜品口味
     @Autowired
     private IDishFlavorService dishFlavorService;
-
-
     @Autowired
     private ICategoryService categoryService;
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     public Result<IPage> getPage(Integer page, Integer pageSize, String name) {
@@ -82,6 +86,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         // 批量修改状态
         updateBatchById(dishList);
 
+        // 清除缓存
+        redisTemplate.delete(RedisCacheConstant.DISH_LIST);
+
         return Result.success("状态修改成功！");
     }
 
@@ -98,6 +105,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
                                 dishFlavorService.removeById(flavor.getId());
                             });
                 });
+
+        // 清除缓存
+        redisTemplate.delete(RedisCacheConstant.DISH_LIST);
+
         return Result.success("删除成功！");
     }
 
@@ -110,6 +121,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         List<DishFlavor> flavors = dishDTO.getFlavors();
         flavors.forEach(flavor -> flavor.setDishId(dishDTO.getId()));
         dishFlavorService.saveBatch(flavors);
+
+        // 清除缓存
+        redisTemplate.delete(RedisCacheConstant.DISH_LIST);
 
         return Result.success("添加成功！");
     }
@@ -151,14 +165,32 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         dishFlavorService.removeByIds(idList);
         dishFlavorService.saveBatch(dishFlavors);
 
+        // 清除缓存
+        redisTemplate.delete(RedisCacheConstant.DISH_LIST);
+
         return Result.success("修改成功！");
     }
 
     @Override
     public Result<List> listDishes(Dish dish) {
+        /**
+         * todo 有个很寄的问题, 缓存会导致选了一个菜品后其他的都不能选口味了
+         */
+
+        // 获取菜品的分类id
+        Long categoryId = dish.getCategoryId();
+        // 根据分类id从缓存中查
+        String dishes = redisTemplate.opsForValue().get(RedisCacheConstant.DISH_LIST + categoryId);
+        List<Dish> dishDTOList = JSON.parseArray(dishes, Dish.class);
+        // 如果缓存中存在该分类下菜品信息
+        if (dishDTOList != null) {
+            // 直接返回
+            return Result.success(dishDTOList);
+        }
+        // 根据分类id从数据库查
         LambdaQueryWrapper<Dish> lqw = new LambdaQueryWrapper<>();
         // 对要查询的条件进行判断，非空则根据该条件查询，对可能查找到的字段都进行一次判断，就可以通用地根据不同传参来实现方法复用
-        lqw.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        lqw.eq(categoryId != null, Dish::getCategoryId, categoryId);
         // 只查询起售的菜品
         lqw.eq(Dish::getStatus, 1);
         // 按更新时间排序
@@ -167,7 +199,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         List<Dish> dishList = this.list(lqw);
         // 用dishDTOList封装带有口味的菜品列表
         // 对于实体集合到DTO集合的拷贝, 用stream流+BeanUtils的形式比较简洁
-        List<Object> dishDTOList = dishList.stream()
+        dishDTOList = dishList.stream()
                 .map(dish1 -> {
                     // 对每个dish对象都创建一个DTO对象
                     DishDTO dishDTO = new DishDTO();
@@ -183,6 +215,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
                     }
                     return dishDTO;
                 }).collect(Collectors.toList());
+
+        // 将结果存入Redis缓存
+        redisTemplate.opsForValue().set(RedisCacheConstant.DISH_LIST + categoryId,
+                JSON.toJSONString(dishDTOList), 30, TimeUnit.MINUTES);
 
         return Result.success(dishDTOList);
     }
