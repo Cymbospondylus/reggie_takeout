@@ -65,7 +65,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
-    @CacheEvict(value = "setmealCache", key = "setmealDTO.categoryId")
+    @CacheEvict(value = "setmealCache", allEntries = true)
     public Result<String> saveSetmealWithDishes(SetmealDTO setmealDTO) {
         // 保存setmeal
         Setmeal setmeal = new Setmeal();
@@ -85,7 +85,8 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         return Result.success("添加套餐成功！");
     }
 
-    @Override  // todo 删除部分不好清空缓存, 也许可以全部清空？
+    @Override
+    @CacheEvict(value = "setmealCache", allEntries = true)  // 设置删除setmealCache下所有的key
     public Result<String> deleteByIds(List<Long> ids) {
         // select count(*) from setmeal where id in (xxx, xxx)
         LambdaQueryWrapper<Setmeal> setmealLqw = new LambdaQueryWrapper<>();
@@ -110,6 +111,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
+    @CacheEvict(value = "setmealCache", allEntries = true)
     public Result<String> updateStatusByIds(Integer stat, String ids) {
         // 获取idList
         List<String> idList = Arrays.asList(ids.split(","));
@@ -144,7 +146,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
-    @CacheEvict(value = "setmealCache", key = "setmealDTO.categoryId")
+    @CacheEvict(value = "setmealCache", key = "#setmealDTO.categoryId")
     public Result<String> updateBySetmealDTO(SetmealDTO setmealDTO) {
         // 修改setmeal
         this.updateById(setmealDTO);

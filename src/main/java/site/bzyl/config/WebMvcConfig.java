@@ -72,7 +72,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
          * 在新增和修改员工时，用拦截器向ThreadLocal变量中存入当前操作者id, 用于填充公共字段
          */
         registry.addInterceptor(backendFieldFillInterceptor)
-                .addPathPatterns("/backend", "/employee", "/category", "/setmeal");
+                .addPathPatterns("/backend/**", "/employee/**", "/category/**", "/setmeal/**");
 
         /**
          * 修改地址等前台信息时，使用拦截器填充公共字段id
