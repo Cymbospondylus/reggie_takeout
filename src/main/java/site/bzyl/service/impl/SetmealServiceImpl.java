@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.controller.exception.BusinessException;
@@ -63,6 +65,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
+    @CacheEvict(value = "setmealCache", key = "setmealDTO.categoryId")
     public Result<String> saveSetmealWithDishes(SetmealDTO setmealDTO) {
         // 保存setmeal
         Setmeal setmeal = new Setmeal();
@@ -82,9 +85,8 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         return Result.success("添加套餐成功！");
     }
 
-    @Override
+    @Override  // todo 删除部分不好清空缓存, 也许可以全部清空？
     public Result<String> deleteByIds(List<Long> ids) {
-        // 利用好框架能够少些if代码，用好Mybatis的关键是先想一下sql代码怎么写
         // select count(*) from setmeal where id in (xxx, xxx)
         LambdaQueryWrapper<Setmeal> setmealLqw = new LambdaQueryWrapper<>();
         setmealLqw.eq(Setmeal::getStatus, 1);
@@ -142,6 +144,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
+    @CacheEvict(value = "setmealCache", key = "setmealDTO.categoryId")
     public Result<String> updateBySetmealDTO(SetmealDTO setmealDTO) {
         // 修改setmeal
         this.updateById(setmealDTO);
@@ -161,6 +164,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
+    @Cacheable(value = "setmealCache", key = "#setmeal.categoryId")
     public Result<List> listSetmeal(Setmeal setmeal) {
         // 条件查询
         LambdaQueryWrapper<Setmeal> lqw = new LambdaQueryWrapper<>();
