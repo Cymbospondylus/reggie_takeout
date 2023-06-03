@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import site.bzyl.commom.Result;
 import site.bzyl.constant.HttpConstant;
+import site.bzyl.constant.RedisCacheConstant;
 import site.bzyl.dao.UserMapper;
 import site.bzyl.dto.UserDTO;
 import site.bzyl.entity.User;
@@ -36,7 +37,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         log.info("验证码：{}", code);
         /*SMSUtils.sendMessage(SystemConstant.SING_NAME, SystemConstant.TEMPLATE_CODE, phone, code);*/
         // 将手机号和验证码存入Redis缓存, 过期时间五分钟
-        redisTemplate.opsForValue().set(phone, code, 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(RedisCacheConstant.LOGIN_CODE_PREFIX + phone, code, 5, TimeUnit.MINUTES);
         // 返回结果信息, 在前端弹出窗口代替发送短信
         return Result.success(code);
     }
@@ -46,7 +47,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 获取手机号
         String phone = userDTO.getPhone();
         // 根据手机号码从Redis中获取验证码
-        String validationCode = redisTemplate.opsForValue().get(phone);
+        String validationCode = redisTemplate.opsForValue().get(RedisCacheConstant.LOGIN_CODE_PREFIX + phone);
         // Redis中不存在code或者输入的验证码与session中的不同
         if (StringUtils.isEmpty(validationCode) || !validationCode.equals(userDTO.getCode())) {
             return Result.error("验证码错误，请重试！");
@@ -65,7 +66,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 将当前用户存入session
         session.setAttribute(HttpConstant.CURRENT_LOGIN_USER_ID, user.getId());
         // 登陆成功后删除验证码
-        redisTemplate.delete(phone);
+        redisTemplate.delete(RedisCacheConstant.LOGIN_CODE_PREFIX + phone);
         // 登录成功
         return Result.success(user);
     }

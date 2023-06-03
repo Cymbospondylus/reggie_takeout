@@ -106,8 +106,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
                             });
                 });
 
-        // 清除缓存
-        redisTemplate.delete(RedisCacheConstant.DISH_LIST);
+        // 清除缓存 todo 这里没有categoryId
+
 
         return Result.success("删除成功！");
     }
@@ -123,7 +123,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         dishFlavorService.saveBatch(flavors);
 
         // 清除缓存
-        redisTemplate.delete(RedisCacheConstant.DISH_LIST);
+        redisTemplate.delete(RedisCacheConstant.DISH_LIST + dishDTO.getCategoryId());
 
         return Result.success("添加成功！");
     }
@@ -166,7 +166,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         dishFlavorService.saveBatch(dishFlavors);
 
         // 清除缓存
-        redisTemplate.delete(RedisCacheConstant.DISH_LIST);
+        redisTemplate.delete(RedisCacheConstant.DISH_LIST + dishDTO.getCategoryId());
+
 
         return Result.success("修改成功！");
     }
@@ -174,14 +175,15 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
     @Override
     public Result<List> listDishes(Dish dish) {
         /**
-         * todo 有个很寄的问题, 缓存会导致选了一个菜品后其他的都不能选口味了
+         * 有个很寄的问题, 缓存会导致选了一个菜品后其他的都不能选口味了
+         * 其实是前面写的有问题, 从缓存中取的应该是dishDTO而不是Dish
          */
 
         // 获取菜品的分类id
         Long categoryId = dish.getCategoryId();
         // 根据分类id从缓存中查
         String dishes = redisTemplate.opsForValue().get(RedisCacheConstant.DISH_LIST + categoryId);
-        List<Dish> dishDTOList = JSON.parseArray(dishes, Dish.class);
+        List<DishDTO> dishDTOList = JSON.parseArray(dishes, DishDTO.class);
         // 如果缓存中存在该分类下菜品信息
         if (dishDTOList != null) {
             // 直接返回
