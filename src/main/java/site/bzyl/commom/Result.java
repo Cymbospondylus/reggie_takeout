@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Result<T> {
+public class Result<T> implements Serializable {    // 这里实现Serializable接口是为了能用Spring Cache框架将Result缓存到redis
     /* 响应代码，先按资料里前端代码的写，1成功，0和其他数字失败 */
     private Integer code;
     // 错误消息
