@@ -1,7 +1,9 @@
 package site.bzyl.config;
 
+import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -13,13 +15,24 @@ import site.bzyl.controller.interceptor.BackendFieldFillInterceptor;
 import site.bzyl.controller.interceptor.BackendLoginInterceptor;
 import site.bzyl.controller.interceptor.FrontendFieldFillInterceptor;
 import site.bzyl.controller.interceptor.FrontendLoginInterceptor;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.List;
 
 
 @Configuration
 @Slf4j
+@EnableSwagger2 // 启动Swagger的两个注解
+@EnableKnife4j
 public class WebMvcConfig extends WebMvcConfigurationSupport {
+
+
     @Autowired /* 和添加资源直接输入路径不同，添加拦截器需要Interceptor对象，要自己注入 */
     private BackendLoginInterceptor backendLoginInterceptor;
 
@@ -42,6 +55,12 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .addResourceLocations("classpath:/backend/");
         registry.addResourceHandler("/front/**")
                 .addResourceLocations("classpath:/front/");
+
+        // 访问接口文档
+        registry.addResourceHandler("doc.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
 
@@ -95,5 +114,25 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         messageConverter.setObjectMapper(new JacksonObjectMapper());
         // 将消息转换器对象追加到SpringMVC默认的转换器集合, index为0表示添加到首位，优先执行自定义的转换器
         converters.add(0, messageConverter);
+    }
+
+
+    // 定义文档类型
+    @Bean
+    public Docket createRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("site.bzyl.controller"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("瑞吉外卖")
+                .version("1.0")
+                .description("瑞吉外卖接口文档")
+                .build();
     }
 }
